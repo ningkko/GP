@@ -125,3 +125,53 @@
 (defn crossover
   [parent1 parent2]
   (replace-random-subtree (random-subtree parent1) (random-subtree parent2)))
+
+
+
+(defn sort-by-error
+  [population]
+  (vec (map second
+            (sort( fn [[err1 ind1] [err2 ind2]]
+                  (< err1 err2))
+            (map #(vector (error %) %)
+                 population)))))
+
+(defn select
+  [population tournament-size]
+  
+  (nth population
+         (apply min (repeatedly tournament-size 
+                                #(rand-int (count population))))))
+
+
+
+(defn evolve
+  [popsize]
+  (println "Starting evolution...")
+  (loop [generation 0
+         population (sort-by-error (repeatedly popsize #(random-code 4)))]
+    (let [best (first population)
+          best-error (error best)]
+      (println "======================")
+      (println "Generation:" generation)
+      (println "Best error:" best-error)
+      (println "Best program:" best)
+      (println "     Median error:" (error (nth population 
+                                                (int (/ popsize 2)))))
+      (println "     Average program size:" 
+               (float (/ (reduce + (map count (map flatten population)))
+                         (count population))))
+      (if (< best-error 0.1) ;; good enough to count as success
+        (println "Success:" best)
+        (recur 
+          (inc generation)
+          (sort-by-error      
+            (concat
+              (repeatedly (* 1/2 popsize) #(mutate (select population 7)))
+              (repeatedly (* 1/4 popsize) #(crossover (select population 7)
+                                                     (select population 7)))
+              (repeatedly (* 1/4 popsize) #(select population 7)))))))))
+
+
+(evolve 1000)
+
