@@ -117,7 +117,7 @@
 (defn mutate
   [code]
   (replace-random-subtree code 
-                          (random-code (int (/ (code-size code) 3)))))
+                          (random-code (int (/ (code-size code) 6)))))
 
 
 
@@ -151,17 +151,19 @@
   (loop [generation 0
          population (sort-by-error (repeatedly popsize #(random-code 4)))]
     (let [best (first population)
-          best-error (error best)]
+          best-error (error best)
+          median-error (error (nth population 
+                                                (int (/ popsize 2))))]
       (println "======================")
       (println "Generation:" generation)
       (println "Best error:" best-error)
       (println "Best program:" best)
-      (println "     Median error:" (error (nth population 
-                                                (int (/ popsize 2)))))
-      (println "     Average program size:" 
+      (println "Median error:" median-error)
+      (println "Average program size:" 
                (float (/ (reduce + (map count (map flatten population)))
                          (count population))))
-      (if (< best-error 0.1) ;; good enough to count as success
+      (if (and (= best-error 0)
+              (= median-error 0)) ;; Since we're looking for absolute values, the result has to be exact
         (println "Success:" best)
         (recur 
           (inc generation)
