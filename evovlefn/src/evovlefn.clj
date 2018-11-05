@@ -71,22 +71,57 @@
 ;;(* -4 (- -1 (max x x)))
 
 
+
 ;; the code can be nested vector or just one variable
-(defn code-size
-  [code]
+(defn code-size [code]
   (if (seq? code)
     (count (flatten code));;put thingg all into one seq and return the size
     1));;else size=1
 
 
 
+
 ;; mutation and crossover
 
-(defn random-subtree
+(defn random-subtree 
   [code]
-  (if (zero?(rand-int (code-size code)))
+  
+  (if (zero? (rand-int (code-size code)))
     code
-    (random-subtree
-      (apply concat
-             (map #(repeat (code-size %) %)
-                  (rest code))))))
+    (random-subtree 
+      (rand-nth
+        (apply concat
+               (map #(repeat (code-size %) %)
+                    (rest code)))))))
+
+
+(defn replace-random-subtree
+  [code replacement]
+  (if (zero? (rand-int (code-size code)))
+    replacement
+  
+    (let [position-to-change 
+          (rand-nth 
+            (apply concat
+                   (map #(repeat (code-size %1) %2)
+                        (rest code)
+                        (iterate inc 1))))]
+          (map #(if %1 (replace-random-subtree %2 replacement) %2)
+               (for [n (iterate inc 0)] (= n position-to-change))
+               code))))
+
+
+
+;; use an int depends on the code-size instead of arbitrary 2.
+
+(defn mutate
+  [code]
+  (replace-random-subtree code 
+                          (random-code (int (/ (code-size code) 3)))))
+
+
+
+;; crossover subtrees of p1 and p2
+(defn crossover
+  [parent1 parent2]
+  (replace-random-subtree (random-subtree parent1) (random-subtree parent2)))
