@@ -2,7 +2,7 @@
   :description "Based on Lee Spector's evolvefn."
   :dependencies [[org.clojure/clojure "1.6.0"]]
   :main ^:skip-aot gorilla-test.core
-  :target-path "target/%s"
+  :target-path "target/%s" 
   :bikeshed {:max-line-length 60
              :var-redefs false
              :name-collisions false}
