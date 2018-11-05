@@ -1,10 +1,11 @@
 # evovlefn
 
-Retype and play around with Lee Spector's evolefn
+Revision of Lee Spector's evolefn
+For the purpose of practise
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Download from https://github.com/ningkko/GP/tree/master/evovlefn.
 
 ## Usage
 
@@ -14,7 +15,8 @@ Intro to GP
 
 ## Options
 
-FIXME: listing of options this app accepts.
+gp.evolvefn 
+gp.evolvefn-zip
 
 ## Examples
 
@@ -23,10 +25,6 @@ FIXME: listing of options this app accepts.
 ### Bugs
 
 ...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
