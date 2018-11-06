@@ -1,0 +1,39 @@
+;; stuck at the forth generation...
+Starting evolution...
+======================
+Generation: 0
+Best error: 1.224744871391589
+Best program: (inc (max (* x (+ 2 -2)) (max (- -1 x) (dec x))))
+Median error: 62.67774724732854
+Average program size: 12.024
+======================
+Generation: 1
+Best error: 1.224744871391589
+Best program: (inc (max (* x (+ 2 -2)) (max (- -1 x) (dec x))))
+Median error: 36.53765181289022
+Average program size: 8.228
+======================
+Generation: 2
+Best error: 1.224744871391589
+Best program: (inc (max (* x (+ 2 -2)) (max (- -1 x) (dec x))))
+Median error: 26.362852652928137
+Average program size: 8.16
+======================
+Generation: 3
+Best error: 0.0
+Best program: (max (max -4 (dec (+ 1 (- 0 x)))) x)
+Median error: 19.364916731037084
+Average program size: 11.709
+======================
+Generation: 4
+Best error: 0.0
+Best program: (max x (* x -1))
+Median error: 18.303005217723125
+Average program size: 24.281
+
+Revision:
+Changed second condition and return of the random-subtree function
+Changed the depth of random-code of the initial loop and the tournament-size(from 7 to 4)
+
+And then got stuck on the first generation..
+ 
