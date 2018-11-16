@@ -125,7 +125,7 @@
   (range 12))
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10267#</span>","value":"#'gp.propel-ast/p1__10267#"}],"value":"(#'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267# #'gp.propel-ast/p1__10267#)"}
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"}],"value":"(#'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254#)"}
 ;; <=
 
 ;; @@
@@ -174,8 +174,33 @@
 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/string_absolute</span>","value":"#'gp.propel-ast/string_absolute"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/boolean_is-positive</span>","value":"#'gp.propel-ast/boolean_is-positive"}
 ;; <=
+
+;; @@
+(defn tournament-selection-revised
+  "Elements are sorted according to their erropr first and then the first half will be taken. After which 1/10 of them will be selected"
+  [pop]
+  (let [half-size (/ (count pop) 2)
+        tournament-set (take half-size (apply min-key :total-error pop))
+        tournament-size (/ (count tournament-set) 10)]
+        (take tournament-size (shuffle pop))
+    ))
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/tournament-selection-revised</span>","value":"#'gp.propel-ast/tournament-selection-revised"}
+;; <=
+
+;; @@
+;;min-key apply a function and return the one with least value
+;;(min-key abs -8 3 4 5)
+;;3
+;; @@
+
+;; @@
+
+;; @@
 
 ;; @@
 
