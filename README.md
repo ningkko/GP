@@ -1,5 +1,5 @@
 Genetic programming playground
 
-Download, install lein and Gorilla
+Download, install lein and Gorilla, cd to the directory and $ Lein gorilla 
 
-$ Lein gorilla 
+Load target clj and run
