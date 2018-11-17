@@ -4,10 +4,12 @@
 ;;; # ast
 ;;; 
 ;;; #### TODO
-;;; 1. Readin data Done
-;;; 2. Get input data & target data Done
+;;; 1. Readin data (Done)
+;;; 2. Get input data & target data (Done)
+;;; 2. crossover
 ;;; 2. Error function
 ;;; 3. Simple GP
+;;; 4. function to decide which crossover to use overtime
 ;;; 4. lexicase
 ;;; 
 ;;; 
@@ -227,7 +229,7 @@
 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/crossover-revised</span>","value":"#'gp.propel-ast/crossover-revised"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/uniform-crossover</span>","value":"#'gp.propel-ast/uniform-crossover"}
 ;; <=
 
 ;; @@
@@ -241,12 +243,18 @@
                    plushy-b
                    plushy-a))
         length (count longer)
+        chunk-length (int (/ length point-number))
         length-diff (- (count longer) (count shorter))
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
     
     (remove #(= % :crossover-padding)
-            (let [mid (/ length 2)]
-              ))))
+            (if (even? length)
+              (repeatedly  
+                #((take chunk-length %1)
+                  (drop (* chunk-length 2) %1)
+                  (take chunk-length %)
+                (take chunk-length plushy-a)
+                (take-last mid plushy-b ))))))
 
 ;; @@
 ;; =>
@@ -305,12 +313,77 @@
         #(rand-nth instruction)) 0)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.Symbol</span>","value":"clojure.lang.Symbol"}
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;; take first half of the first laziseq
+;; and the second half of the second lazy seq
+(comment
+  (def instruction ['plus 'minus 'integer_+])
+  (def instruction2 ['plus 'integer_+ 'minus])
+
+  (let [length (count instruction) 
+        mid (int (/ length 2))]
+    (if (even? length)
+      (concat (take mid instruction)
+              (take-last mid instruction2))
+      (concat (take mid instruction)
+              (take-last (+ mid 1) instruction2)))))
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;;atom, swap!, @
+(comment 
+  (def a (atom 1))
+  (type a)
+  (type @a)
+  (swap! a inc)
+  ;;#'gp.propel-ast/a
+  ;;clojure.lang.Atom
+  ;;java.lang.Long
+  ;;2
+ )
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
 
 ;; @@
 
+
 ;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;; while
+(comment
+(def a (atom 10))                                
+(while 
+  (pos? @a) 
+  (do 
+    (println @a) 
+    (swap! a dec)))
+
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
 
 ;; @@
 
