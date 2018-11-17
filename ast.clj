@@ -233,6 +233,41 @@
 ;; <=
 
 ;; @@
+(defn k-point-crossover-odduni
+  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points..
+  take odd genomes, uniform
+  a-1+b-1+a-3+b-3+..."
+  
+  [point-number plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (counted? plushy-a)
+                 (max-key count plushy-b plushy-a)
+                 (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a))
+        length (count longer)
+        chunk-size (int (/ length point-number))
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+    
+     (remove #(= % :crossover-padding)
+              (concat
+                (repeatedly 
+                  (int (/ length chunk-size))
+                  #((take chunk-size %1)
+                    (drop (* chunk-size 2) %1)
+                    (take chunk-size %2)
+                    (drop (* chunk-size 2) %2))
+                  plushy-a
+                  plushy-b)
+                plushy-a
+                plushy-b))))
+	
+	
+    
+    
+    
+    
 (defn k-point-crossover-interuni
   "k-point crossover is equivalent to performing k single-point crossovers with different crossover points..
   interleaving, uniform
@@ -250,25 +285,55 @@
         length-diff (- (count longer) (count shorter))
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
     
-    (remove #(= % :crossover-padding)
+     (remove #(= % :crossover-padding)
               (concat
-                (while (and  
-                         (not (> (count plushy-a) chunk-size)) 
-                         (not (> (count plushy-b) chunk-size)))
-                  (do
-                    (repeatedly 
-                      #((take chunk-size %1)
-                        (drop (* chunk-size 2) %1)
-                        (take chunk-size %)
-                        (drop (* chunk-size 2) %2)
-                        plushy-a
-                        plushy-b ))))
+                (repeatedly 
+                  (int (/ length chunk-size))
+                  #((take chunk-size %1)
+                    (drop (* chunk-size 2) %1)
+                    (take chunk-size %2)
+                    (drop (* chunk-size 2) %2))
+                  (drop chunk-size plushy-a)
+                  plushy-b)
                 plushy-a
                 plushy-b))))
 	
+    
+    
+    
+    
+(defn k-point-crossover-evenuni
+  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points..
+  take odd genomes, uniform
+  a-2+b-2+a-2+b-2+..."
+  
+  [point-number plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (counted? plushy-a)
+                 (max-key count plushy-b plushy-a)
+                 (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a))
+        length (count longer)
+        chunk-size (int (/ length point-number))
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+    
+    (remove #(= % :crossover-padding)
+              (concat
+                (repeatedly 
+                  (int (/ length chunk-size))
+                  #((take chunk-size %1)
+                    (drop (* chunk-size 2) %1)
+                    (take chunk-size %2)
+                    (drop (* chunk-size 2) %2))
+                  (drop chunk-size plushy-a)
+                  (drop chunk-size plushy-b))
+                plushy-a
+                plushy-b))))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-interuni</span>","value":"#'gp.propel-ast/k-point-crossover-interuni"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-evenuni</span>","value":"#'gp.propel-ast/k-point-crossover-evenuni"}
 ;; <=
 
 ;; @@
@@ -291,15 +356,10 @@
                  longer))))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-random</span>","value":"#'gp.propel-ast/k-point-crossover-random"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-odduni</span>","value":"#'gp.propel-ast/k-point-crossover-odduni"}
 ;; <=
 
 ;; @@
-;;remove
-(comment
-  (remove pos? [1 -2 2 -1 3 7 0])
-  ;;(-2 -1 0)
-  )
 
 ;; @@
 ;; =>
@@ -400,6 +460,19 @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
+
+;; @@
+
+
+	
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-evenuni</span>","value":"#'gp.propel-ast/k-point-crossover-evenuni"}
+;; <=
+
+;; @@
+
+;; @@
 
 ;; @@
 
