@@ -1,3 +1,5 @@
 Genetic programming playground
 
-Download, install lein, and call "lein run gp.abs"
+Download, install lein and Gorilla
+
+$ Lein gorilla 
