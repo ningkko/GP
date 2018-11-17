@@ -233,8 +233,11 @@
 ;; <=
 
 ;; @@
-(defn k-point-crossover-uniform
-  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points.."
+(defn k-point-crossover-interuni
+  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points..
+  interleaving, uniform
+  a-1+b-2+a-3+b-4+..."
+  
   [point-number plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (counted? plushy-a)
@@ -243,22 +246,29 @@
                    plushy-b
                    plushy-a))
         length (count longer)
-        chunk-length (int (/ length point-number))
+        chunk-size (int (/ length point-number))
         length-diff (- (count longer) (count shorter))
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
     
     (remove #(= % :crossover-padding)
-            (if (even? length)
-              (repeatedly  
-                #((take chunk-length %1)
-                  (drop (* chunk-length 2) %1)
-                  (take chunk-length %)
-                (take chunk-length plushy-a)
-                (take-last mid plushy-b ))))))
-
+              (concat
+                (while (and  
+                         (not (> (count plushy-a) chunk-size)) 
+                         (not (> (count plushy-b) chunk-size)))
+                  (do
+                    (repeatedly 
+                      #((take chunk-size %1)
+                        (drop (* chunk-size 2) %1)
+                        (take chunk-size %)
+                        (drop (* chunk-size 2) %2)
+                        plushy-a
+                        plushy-b ))))
+                plushy-a
+                plushy-b))))
+	
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.PersistentVector</span>","value":"clojure.lang.PersistentVector"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-interuni</span>","value":"#'gp.propel-ast/k-point-crossover-interuni"}
 ;; <=
 
 ;; @@
@@ -278,7 +288,7 @@
     (remove #(= % :crossover-padding)
             (map #(if (< (rand) 0.5) %1 %2)
                  shorter-padded
-                 longer)))))
+                 longer))))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-random</span>","value":"#'gp.propel-ast/k-point-crossover-random"}
@@ -297,6 +307,12 @@
 ;; <=
 
 ;; @@
+
+;;remove
+(comment
+  (remove pos? [1 -2 2 -1 3 7 0])
+  ;;(-2 -1 0)
+  )
 
 ;; @@
 ;; =>
