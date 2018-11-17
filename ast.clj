@@ -346,28 +346,47 @@
                  (if (= shorter plushy-a)
                    plushy-b
                    plushy-a))
-        
-        length-diff (- (count longer) (count shorter))
+        target-length (count longer)
+        new-gene-length (atom 0) ;; length of the new gene
+        point-left (atom point-number)
+        times (atom 0)
+        length-diff (- target-length (count shorter))
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
     
     (remove #(= % :crossover-padding)
-            (map #(if (< (rand) 0.5) %1 %2)
-                 shorter-padded
-                 longer))))
+            (concat
+              (while 
+                (< new-gene-length target-length)
+                (do
+                  (apply
+                    #(let [chunk-size (+ 1 (rand-int (- (count %1) point-left 1 1)))]
+                      (doall
+                        (take chunk-size %1)
+                        (drop chunk-size %1)
+                        (drop chunk-size %2))
+                      (if (even? times) 
+                        [plushy-a
+                         plushy-b]
+                        [plushy-b
+                         plushy-a]))) 
+                  
+                  (swap! point-left dec)
+                  (swap! times inc)))
+              plushy-a
+              plushy-b))))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-odduni</span>","value":"#'gp.propel-ast/k-point-crossover-odduni"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;user/k-point-crossover-random</span>","value":"#'user/k-point-crossover-random"}
 ;; <=
 
 ;; @@
-
+(apply #(inc %) [1])
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;;; {"type":"html","content":"<span class='clj-long'>2</span>","value":"2"}
 ;; <=
 
 ;; @@
-
 ;;remove
 (comment
   (remove pos? [1 -2 2 -1 3 7 0])
@@ -456,6 +475,94 @@
 3
 2
 1)
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;;dotimes
+(comment
+(defn Example []
+   (dotimes [n 5]
+   (println n)))
+(Example)
+0
+1
+2
+3
+4
+)
+
+;;loop
+(comment
+  (defn Example []
+   (loop [x 10]
+      (when (> x 1)
+         (println x)
+         (recur (- x 2))))) 
+  (Example)
+  10
+  8
+  6
+  4
+  2)
+
+;;doseq
+(comment
+  (defn Example []
+   (doseq [n [0 1 2]]
+   (println n)))
+(Example)
+0
+1
+2)
+
+;;while
+(comment
+(defn Example []
+   (def x (atom 1)) ;;atom, changable variable
+   (while ( < @x 5 ) ;;@gets its value
+      (do
+         (println @x)
+         (swap! x inc)))) ;; swap changes its value
+(Example))
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;; if do
+(comment
+  "do multi-task under each condition"
+  (defn Example [] (
+   if (= 2 2)
+      (do(println "Both the values are equal")
+         (println "true"))
+      (do(println "Both the values are not equal")
+         (println "false"))))
+(Example)
+Both the values are equal
+true
+  )
+
+
+;;case
+(comment
+(defn Example []
+   (def x 5) 
+   (case x 
+     10 (println "x is 10")
+     2 (println "x is 2")
+     odd? (println "x is odd") ;; only case numbers, will not print this line
+     5 (println "x is 5")
+     (println "x is neither 5 nor 10")))
+
+(Example)
+x is 5
+)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
@@ -463,12 +570,7 @@
 
 ;; @@
 
-
-	
 ;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-evenuni</span>","value":"#'gp.propel-ast/k-point-crossover-evenuni"}
-;; <=
 
 ;; @@
 
