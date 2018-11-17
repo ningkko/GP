@@ -92,19 +92,21 @@
 ;; @@
 
 ;; @@
-(vector 1 2 3)
-;;[1 2 3]
-(vector '(1 2 3))
-;;[(1 2 3)]
-(vec '(1 2 3))
-;;[1 2 3
-;;(vec 1 2 3)
-;;Exception thrown: clojure.lang.ArityException (Wrong number of args (3) passed to: core/vec)
+(comment
+  (vector 1 2 3)
+  [1 2 3]
+  (vector '(1 2 3))
+  [(1 2 3)]
+  (vec '(1 2 3))
+  [1 2 3]
+  (vec 1 2 3)
+  ;;Exception thrown: clojure.lang.ArityException (Wrong number of args (3) passed to: core/vec)
+)
 
 
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>1</span>","value":"1"},{"type":"html","content":"<span class='clj-long'>2</span>","value":"2"},{"type":"html","content":"<span class='clj-long'>3</span>","value":"3"}],"value":"[1 2 3]"}
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
 
 ;; @@
@@ -134,17 +136,18 @@
 ;; @@
 
 ;; @@
-
-;;(def ra (vec (get-target-data "src/training_set_metadata.csv" 1)))
-;;(def decl (vec (get-target-data "src/training_set_metadata.csv" 2)))
-;;(def gal_l (vec (get-target-data "src/training_set_metadata.csv" 3)))
-;;(def gal_b (vec (get-target-data "src/training_set_metadata.csv" 4)))
-;;(def ddf (vec (get-target-data "src/training_set_metadata.csv" 5)))
-;;(def hostgal_specz (vec (get-target-data "src/training_set_metadata.csv" 6)))
-;;(def hostgal_photoz (vec (get-target-data "src/training_set_metadata.csv" 7)))
-;;(def hostgal_photoz_err (vec (get-target-data "src/training_set_metadata.csv" 8)))
-;;(def distmod (vec (get-target-data "src/training_set_metadata.csv" 9)))
-;;(def mwebv (vec (get-target-data "src/training_set_metadata.csv" 10)))
+;;brutal-force biding
+(comment
+  (def ra (vec (get-target-data "src/training_set_metadata.csv" 1)))
+  (def decl (vec (get-target-data "src/training_set_metadata.csv" 2)))
+  (def gal_l (vec (get-target-data "src/training_set_metadata.csv" 3)))
+  (def gal_b (vec (get-target-data "src/training_set_metadata.csv" 4)))
+  (def ddf (vec (get-target-data "src/training_set_metadata.csv" 5)))
+  (def hostgal_specz (vec (get-target-data "src/training_set_metadata.csv" 6)))
+  (def hostgal_photoz (vec (get-target-data "src/training_set_metadata.csv" 7)))
+  (def hostgal_photoz_err (vec (get-target-data "src/training_set_metadata.csv" 8)))
+  (def distmod (vec (get-target-data "src/training_set_metadata.csv" 9)))
+  (def mwebv (vec (get-target-data "src/training_set_metadata.csv" 10))))
 ;; @@
 
 ;; @@
@@ -193,10 +196,117 @@
 ;; <=
 
 ;; @@
-;;min-key apply a function and return the one with least value
-;;(min-key abs -8 3 4 5)
-;;3
+;;min-key
+(comment
+  min-key apply a function and return the one with least value
+  (min-key abs -8 3 4 5)
+  3)
 ;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+(defn uniform-crossover
+  "Crosses over two individuals using uniform crossover. Pads shorter one."
+  [plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (counted? plushy-a);;choose a quicker way to set longer&shorter
+                 (max-key count plushy-b plushy-a)
+                 (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a))
+        
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+    
+    (remove #(= % :crossover-padding)
+            (map #(if (< (rand) 0.5) %1 %2)
+                 shorter-padded
+                 longer))))
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/crossover-revised</span>","value":"#'gp.propel-ast/crossover-revised"}
+;; <=
+
+;; @@
+(defn k-point-crossover-uniform
+  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points.."
+  [point-number plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (counted? plushy-a)
+                 (max-key count plushy-b plushy-a)
+                 (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a))
+        length (count longer)
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+    
+    (remove #(= % :crossover-padding)
+            (let [mid (/ length 2)]
+              ))))
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.PersistentVector</span>","value":"clojure.lang.PersistentVector"}
+;; <=
+
+;; @@
+(defn k-point-crossover-random
+  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points.."
+  [point-number plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (counted? plushy-a)
+                 (max-key count plushy-b plushy-a)
+                 (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a))
+        
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+    
+    (remove #(= % :crossover-padding)
+            (map #(if (< (rand) 0.5) %1 %2)
+                 shorter-padded
+                 longer)))))
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-random</span>","value":"#'gp.propel-ast/k-point-crossover-random"}
+;; <=
+
+;; @@
+;;remove
+(comment
+  (remove pos? [1 -2 2 -1 3 7 0])
+  ;;(-2 -1 0)
+  )
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/instruction</span>","value":"#'gp.propel-ast/instruction"}
+;; <=
+
+;; @@
+(comment
+  (def instruction ['plus 'minus 'integer_+])
+  (type 
+    (nth 
+      (repeatedly ;;repeats functions
+        (+ 1 (rand-int (count instruction))) 
+        #(rand-nth instruction)) 0)))
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.Symbol</span>","value":"clojure.lang.Symbol"}
+;; <=
 
 ;; @@
 
