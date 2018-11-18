@@ -13,3 +13,6 @@ Crossover
 
 Order Crossover (unimplemented)
 -> http://mat.uab.cat/~alseda/MasterOpt/GeneticOperations.pdf
+
+Mutation
+-> https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)
