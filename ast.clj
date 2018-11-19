@@ -233,107 +233,97 @@
 ;; <=
 
 ;; @@
-(defn k-point-crossover-odduni
-  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points..
-  take odd genomes, uniform
-  a-1+b-1+a-3+b-3+..."
+(defn multi-point-crossover-parallel-odd
+  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
+  take odd genomes, uniform sized
+  a-1+b-1+a-3+b-3+...+a_left+b_left"
   
-  [point-number plushy-a plushy-b]
+  [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (counted? plushy-a)
                  (max-key count plushy-b plushy-a)
                  (if (= shorter plushy-a)
                    plushy-b
                    plushy-a))
-        length (count longer)
-        chunk-size (int (/ length point-number))
+        length (count longer) ;;length of genes
+        chunk-number (+ 1 (rand-int length))
+        chunk-size (int (/ length chunk-number))
         length-diff (- (count longer) (count shorter))
-        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))
+        segmented-a (map vec (partition-all chunk-size plushy-a))
+        segmented-b (map vec (partition-all chunk-size plushy-b))
+        index (vec (filter even? (range (count segmented-a))))]
     
-     (remove #(= % :crossover-padding)
-              (concat
-                (repeatedly 
-                  (int (/ length chunk-size))
-                  #((take chunk-size %1)
-                    (drop (* chunk-size 2) %1)
-                    (take chunk-size %2)
-                    (drop (* chunk-size 2) %2))
-                  plushy-a
-                  plushy-b)
-                plushy-a
-                plushy-b))))
-	
+     (remove #(= % :crossover-padding) 
+             (mapcat 
+               #(concat (nth segmented-a %) (nth segmented-b %)) 
+               index)))) 
 	
     
-    
-    
-    
-(defn k-point-crossover-interuni
-  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points..
-  interleaving, uniform
-  a-1+b-2+a-3+b-4+..."
+
+(defn multi-point-crossover-parallel-interleaving
+  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
+  take odd genomes, uniform sized
+  a-1+b-2+a-3+b-4+...+a_left+b_left"
   
-  [point-number plushy-a plushy-b]
+  [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (counted? plushy-a)
                  (max-key count plushy-b plushy-a)
                  (if (= shorter plushy-a)
                    plushy-b
                    plushy-a))
-        length (count longer)
-        chunk-size (int (/ length point-number))
+        length (count longer) ;;length of genes
+        ;;at least 2 chunks'
+        chunk-number (+ 2 (rand-int (dec length)))
+        chunk-size (int (/ length chunk-number))
         length-diff (- (count longer) (count shorter))
-        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))
+        segmented-a (map vec (partition-all chunk-size plushy-a))
+        segmented-b (map vec (partition-all chunk-size plushy-b))
+        index (range (count segmented-a))]
     
-     (remove #(= % :crossover-padding)
-              (concat
-                (repeatedly 
-                  (int (/ length chunk-size))
-                  #((take chunk-size %1)
-                    (drop (* chunk-size 2) %1)
-                    (take chunk-size %2)
-                    (drop (* chunk-size 2) %2))
-                  (drop chunk-size plushy-a)
-                  plushy-b)
-                plushy-a
-                plushy-b))))
+     (remove #(= % :crossover-padding) 
+             (mapcat 
+               #(nth 
+                  (if (even? %)
+                    segmented-a
+                    segmented-b)
+                  %)
+               index)))) 
 	
     
     
     
-    
-(defn k-point-crossover-evenuni
-  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points..
-  take odd genomes, uniform
-  a-2+b-2+a-2+b-2+..."
+(defn multi-point-crossover-parallel-even
+  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
+  take odd genomes, uniform sized
+  a-2+b-2+a-4+b-4+...+a_left+b_left"
   
-  [point-number plushy-a plushy-b]
+  [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (counted? plushy-a)
                  (max-key count plushy-b plushy-a)
                  (if (= shorter plushy-a)
                    plushy-b
                    plushy-a))
-        length (count longer)
-        chunk-size (int (/ length point-number))
+        length (count longer) ;;length of genes
+        ;;at least 2 chunks'
+        chunk-number (+ 2 (rand-int (dec length)))
+        chunk-size (int (/ length chunk-number))
         length-diff (- (count longer) (count shorter))
-        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))
+        segmented-a (map vec (partition-all chunk-size plushy-a))
+        segmented-b (map vec (partition-all chunk-size plushy-b))
+        index (vec (filter odd? (range (count segmented-a))))]
     
-    (remove #(= % :crossover-padding)
-              (concat
-                (repeatedly 
-                  (int (/ length chunk-size))
-                  #((take chunk-size %1)
-                    (drop (* chunk-size 2) %1)
-                    (take chunk-size %2)
-                    (drop (* chunk-size 2) %2))
-                  (drop chunk-size plushy-a)
-                  (drop chunk-size plushy-b))
-                plushy-a
-                plushy-b))))
+     (remove #(= % :crossover-padding) 
+             (mapcat 
+               #(concat (nth segmented-a %) (nth segmented-b %)) 
+               index)))) 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/k-point-crossover-evenuni</span>","value":"#'gp.propel-ast/k-point-crossover-evenuni"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;user/multi-point-crossover-parallel-even</span>","value":"#'user/multi-point-crossover-parallel-even"}
 ;; <=
 
 ;; @@
