@@ -86,35 +86,18 @@
 ;; <=
 
 ;; @@
-
-;; @@
-
-;; @@
-
-;; @@
-
-;; @@
-(comment
-  (vector 1 2 3)
-  [1 2 3]
-  (vector '(1 2 3))
-  [(1 2 3)]
-  (vec '(1 2 3))
-  [1 2 3]
-  (vec 1 2 3)
-  ;;Exception thrown: clojure.lang.ArityException (Wrong number of args (3) passed to: core/vec)
-)
-
-
+(vector 1 2 3)
+(vector '(1 2 3))
+(vec '(1 2 3))
+;;exception:(vec 1 2 3)
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;;; {"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>1</span>","value":"1"},{"type":"html","content":"<span class='clj-long'>2</span>","value":"2"},{"type":"html","content":"<span class='clj-long'>3</span>","value":"3"}],"value":"[1 2 3]"}
 ;; <=
 
 ;; @@
 (def data-names ["object_id" "ra" "decl" "gal_l" "gal_b" "ddf" "hostgal_specz" "hostgal_photoz" "hostgal_photoz_err" "distmod" "mwebv" "target"])
 (nth data-names 1)
-
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-string'>&quot;ra&quot;</span>","value":"\"ra\""}
@@ -123,17 +106,23 @@
 ;; @@
 ;; bind input data name to data
 (map 
-  #(def %1 (vec 
-             (get-target-data "src/training_set_metadata.csv" %2)))
+  #(def %1 
+     (vec (get-target-data "src/training_set_metadata.csv" %2)))
   data-names
   (range 12))
+
+;; v2
+(doseq [n data-names number (range 12)] 
+  (def n 
+    (vec (get-target-data "src/training_set_metadata.csv" number))))
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"},{"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/p1__10254#</span>","value":"#'gp.propel-ast/p1__10254#"}],"value":"(#'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254# #'gp.propel-ast/p1__10254#)"}
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
 
 ;; @@
-;;ra
+ra
+
 
 ;; @@
 
@@ -151,9 +140,26 @@
   (def distmod (vec (get-target-data "src/training_set_metadata.csv" 9)))
   (def mwebv (vec (get-target-data "src/training_set_metadata.csv" 10))))
 ;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
 
 ;; @@
-;; some supplements
+
+;; @@
+
+;; @@
+
+;;remove
+(remove pos? [1 -2 2 -1 3 7 0])
+
+
+;; @@
+;; =>
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>-2</span>","value":"-2"},{"type":"html","content":"<span class='clj-long'>-1</span>","value":"-1"},{"type":"html","content":"<span class='clj-long'>0</span>","value":"0"}],"value":"(-2 -1 0)"}
+;; <=
+
+;; @@
 (defn string_absolute
   [state]
   (make-push-instruction state
@@ -198,17 +204,6 @@
 ;; <=
 
 ;; @@
-;;min-key
-(comment
-  min-key apply a function and return the one with least value
-  (min-key abs -8 3 4 5)
-  3)
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
 (defn uniform-crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
   [plushy-a plushy-b]
@@ -233,6 +228,7 @@
 ;; <=
 
 ;; @@
+;; low possibility
 (defn multi-point-crossover-parallel-odd
   "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
   take odd genomes, uniform sized
@@ -260,7 +256,7 @@
                index)))) 
 	
     
-
+;;high P
 (defn multi-point-crossover-parallel-interleaving
   "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
   take odd genomes, uniform sized
@@ -294,7 +290,7 @@
 	
     
     
-    
+;; low probability
 (defn multi-point-crossover-parallel-even
   "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
   take odd genomes, uniform sized
@@ -327,65 +323,68 @@
 ;; <=
 
 ;; @@
-(defn k-point-crossover-random
-  "k-point crossover is equivalent to performing k single-point crossovers with different crossover points.."
-  [point-number plushy-a plushy-b]
-  (let [shorter (min-key count plushy-a plushy-b)
-        longer (if (counted? plushy-a)
-                 (max-key count plushy-b plushy-a)
-                 (if (= shorter plushy-a)
-                   plushy-b
-                   plushy-a))
-        target-length (count longer)
-        new-gene-length (atom 0) ;; length of the new gene
-        point-left (atom point-number)
-        times (atom 0)
-        length-diff (- target-length (count shorter))
-        shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
-    
-    (remove #(= % :crossover-padding)
-            (concat
-              (while 
-                (< new-gene-length target-length)
-                (do
-                  (apply
-                    #(let [chunk-size (+ 1 (rand-int (- (count %1) point-left 1 1)))]
-                      (doall
-                        (take chunk-size %1)
-                        (drop chunk-size %1)
-                        (drop chunk-size %2))
-                      (if (even? times) 
-                        [plushy-a
-                         plushy-b]
-                        [plushy-b
-                         plushy-a]))) 
-                  
-                  (swap! point-left dec)
-                  (swap! times inc)))
-              plushy-a
-              plushy-b))))
+;;didn't work, a momento. And randomized multipoint crossover works the same as uniform crossover.
+(comment
+  (defn k-point-crossover-randomsized
+    ""
+    [point-number plushy-a plushy-b]
+    (let [shorter (min-key count plushy-a plushy-b)
+          longer (if (counted? plushy-a)
+                   (max-key count plushy-b plushy-a)
+                   (if (= shorter plushy-a)
+                     plushy-b
+                     plushy-a))
+          target-length (count longer)
+          new-gene-length (atom 0) ;; length of the new gene
+          point-left (atom point-number)
+          times (atom 0)
+          length-diff (- target-length (count shorter))
+          shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
+
+      (remove #(= % :crossover-padding)
+              (concat
+                (while 
+                  (< new-gene-length target-length)
+                  (do
+                    (apply
+                      #(let [chunk-size (+ 1 (rand-int (- (count %1) point-left 1 1)))]
+                        (doall
+                          (take chunk-size %1)
+                          (drop chunk-size %1)
+                          (drop chunk-size %2))
+                        (if (even? times) 
+                          [plushy-a
+                           plushy-b]
+                          [plushy-b
+                           plushy-a]))) 
+
+                    (swap! point-left dec)
+                    (swap! times inc)))
+                plushy-a
+                plushy-b))))
+  )
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;user/k-point-crossover-random</span>","value":"#'user/k-point-crossover-random"}
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
 
 ;; @@
+;;apply
 (apply #(inc %) [1])
+
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-long'>2</span>","value":"2"}
 ;; <=
 
 ;; @@
-;;remove
-(comment
-  (remove pos? [1 -2 2 -1 3 7 0])
-  ;;(-2 -1 0)
-  )
+;;min-key
+;;min-key apply a function and return the one with least value
+(min-key abs -8 3 4 5)
 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/instruction</span>","value":"#'gp.propel-ast/instruction"}
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>-2</span>","value":"-2"},{"type":"html","content":"<span class='clj-long'>-1</span>","value":"-1"},{"type":"html","content":"<span class='clj-long'>0</span>","value":"0"}],"value":"(-2 -1 0)"}
 ;; <=
 
 ;; @@
@@ -422,32 +421,18 @@
 
 ;; @@
 ;;atom, swap!, @
-(comment 
-  (def a (atom 1))
-  (type a)
-  (type @a)
-  (swap! a inc)
-  ;;#'gp.propel-ast/a
-  ;;clojure.lang.Atom
-  ;;java.lang.Long
-  ;;2
- )
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-
+(def a (atom 1))
+(type a)
+(type @a)
+(swap! a inc)
 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;;; {"type":"html","content":"<span class='clj-long'>2</span>","value":"2"}
 ;; <=
 
 ;; @@
 ;; while
-(comment
 (def a (atom 10))                                
 (while 
   (pos? @a) 
@@ -455,92 +440,132 @@
     (println @a) 
     (swap! a dec)))
 
-10
-9
-8
-7
-6
-5
-4
-3
-2
-1)
 
 ;; @@
+;; ->
+;;; 10
+;;; 9
+;;; 8
+;;; 7
+;;; 6
+;;; 5
+;;; 4
+;;; 3
+;;; 2
+;;; 1
+;;; 
+;; <-
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
 
 ;; @@
 ;;dotimes
-(comment
 (defn Example []
    (dotimes [n 5]
    (println n)))
 (Example)
-0
-1
-2
-3
-4
-)
+;; @@
+;; ->
+;;; 0
+;;; 1
+;;; 2
+;;; 3
+;;; 4
+;;; 
+;; <-
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
 
 ;;loop
-(comment
-  (defn Example []
-   (loop [x 10]
-      (when (> x 1)
-         (println x)
-         (recur (- x 2))))) 
-  (Example)
-  10
-  8
-  6
-  4
-  2)
 
-;;doseq
-(comment
-  (defn Example []
-   (doseq [n [0 1 2]]
-   (println n)))
+(defn Example []
+  (loop [x 10]
+    (when (> x 1)
+      (println x)
+      (recur (- x 2))))) 
 (Example)
-0
-1
-2)
+
+;; @@
+;; ->
+;;; 10
+;;; 8
+;;; 6
+;;; 4
+;;; 2
+;;; 
+;; <-
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;;doseq
+
+(defn Example []
+  (doseq [n [0 1 2]]
+    (println n)))
+(Example)
+
+
+;; @@
+;; ->
+;;; 0
+;;; 1
+;;; 2
+;;; 
+;; <-
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
 
 ;;while
-(comment
 (defn Example []
    (def x (atom 1)) ;;atom, changable variable
    (while ( < @x 5 ) ;;@gets its value
       (do
          (println @x)
          (swap! x inc)))) ;; swap changes its value
-(Example))
+(Example)
+
+;; @@
+;; ->
+;;; 1
+;;; 2
+;;; 3
+;;; 4
+;;; 
+;; <-
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+
+;; if do
+;;"do multi-task under each condition"
+(defn Example [] (
+                   if (= 2 2)
+                   (do(println "Both the values are equal")
+                     (println "true"))
+                   (do(println "Both the values are not equal")
+                     (println "false"))))
+(Example)
+
+
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
 
 ;; @@
-;; if do
-(comment
-  "do multi-task under each condition"
-  (defn Example [] (
-   if (= 2 2)
-      (do(println "Both the values are equal")
-         (println "true"))
-      (do(println "Both the values are not equal")
-         (println "false"))))
-(Example)
-Both the values are equal
-true
-  )
-
 
 ;;case
-(comment
 (defn Example []
    (def x 5) 
    (case x 
@@ -551,16 +576,15 @@ true
      (println "x is neither 5 nor 10")))
 
 (Example)
-x is 5
-)
+
 ;; @@
+;; ->
+;;; x is 5
+;;; 
+;; <-
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
-
-;; @@
-
-;; @@
 
 ;; @@
 
