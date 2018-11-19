@@ -4,7 +4,9 @@
 ;;; # ast-test
 ;;; 1. tournament (+)
 ;;; 2. uniform-crossover (+)
-;;; 3. multipoint crossover
+;;; 3. multipoint crossover (+)
+;;; 4. mutation
+;;; 
 ;;; 
 ;; **
 

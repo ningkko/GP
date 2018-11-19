@@ -1,3 +1,6 @@
+;; gorilla-repl.fileformat = 1
+
+;; @@
 (ns propel.core
   (:gen-class))
 
@@ -24,6 +27,8 @@
     'boolean_and
     'boolean_or
     'boolean_not
+    'boolean_is-negative
+    'boolean_is-positive
     'boolean_=
     'string_=
     'string_take
@@ -31,18 +36,13 @@
     'string_reverse
     'string_concat
     'string_length
+    'string_absolute
     'string_includes?
     'close
     0
     1
     true
     false
-    ""
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "A"
-    "C"
-    "G"
-    "T"
    ))
 
 (def opens ; number of blocks opened by instructions (default = 0)
@@ -478,3 +478,19 @@
                           #(if (fn? %) % (eval %))))))
 
 
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;propel.core/-main</span>","value":"#'propel.core/-main"}
+;; <=
+
+;; @@
+instructions
+;; @@
+;; =>
+;;; {"type":"list-like","open":"<span class='clj-list'>(</span>","close":"<span class='clj-list'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>in1</span>","value":"in1"},{"type":"html","content":"<span class='clj-symbol'>integer_+</span>","value":"integer_+"},{"type":"html","content":"<span class='clj-symbol'>integer_-</span>","value":"integer_-"},{"type":"html","content":"<span class='clj-symbol'>integer_*</span>","value":"integer_*"},{"type":"html","content":"<span class='clj-symbol'>integer_%</span>","value":"integer_%"},{"type":"html","content":"<span class='clj-symbol'>integer_=</span>","value":"integer_="},{"type":"html","content":"<span class='clj-symbol'>exec_dup</span>","value":"exec_dup"},{"type":"html","content":"<span class='clj-symbol'>exec_if</span>","value":"exec_if"},{"type":"html","content":"<span class='clj-symbol'>boolean_and</span>","value":"boolean_and"},{"type":"html","content":"<span class='clj-symbol'>boolean_or</span>","value":"boolean_or"},{"type":"html","content":"<span class='clj-symbol'>boolean_not</span>","value":"boolean_not"},{"type":"html","content":"<span class='clj-symbol'>boolean_is-negative</span>","value":"boolean_is-negative"},{"type":"html","content":"<span class='clj-symbol'>boolean_is-positive</span>","value":"boolean_is-positive"},{"type":"html","content":"<span class='clj-symbol'>boolean_=</span>","value":"boolean_="},{"type":"html","content":"<span class='clj-symbol'>string_=</span>","value":"string_="},{"type":"html","content":"<span class='clj-symbol'>string_take</span>","value":"string_take"},{"type":"html","content":"<span class='clj-symbol'>string_drop</span>","value":"string_drop"},{"type":"html","content":"<span class='clj-symbol'>string_reverse</span>","value":"string_reverse"},{"type":"html","content":"<span class='clj-symbol'>string_concat</span>","value":"string_concat"},{"type":"html","content":"<span class='clj-symbol'>string_length</span>","value":"string_length"},{"type":"html","content":"<span class='clj-symbol'>string_absolute</span>","value":"string_absolute"},{"type":"html","content":"<span class='clj-symbol'>string_includes?</span>","value":"string_includes?"},{"type":"html","content":"<span class='clj-symbol'>close</span>","value":"close"},{"type":"html","content":"<span class='clj-long'>0</span>","value":"0"},{"type":"html","content":"<span class='clj-long'>1</span>","value":"1"},{"type":"html","content":"<span class='clj-unkown'>true</span>","value":"true"},{"type":"html","content":"<span class='clj-unkown'>false</span>","value":"false"}],"value":"(in1 integer_+ integer_- integer_* integer_% integer_= exec_dup exec_if boolean_and boolean_or boolean_not boolean_is-negative boolean_is-positive boolean_= string_= string_take string_drop string_reverse string_concat string_length string_absolute string_includes? close 0 1 true false)"}
+;; <=
+
+;; @@
+
+;; @@
