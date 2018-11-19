@@ -6,7 +6,8 @@
 ;;; #### TODO
 ;;; 1. Readin data (Done)
 ;;; 2. Get input data & target data (Done)
-;;; 2. crossover
+;;; 2. crossover (Testing)
+;;; 2. mutation (if error > C, flip bit?)
 ;;; 2. Error function
 ;;; 3. Simple GP
 ;;; 4. function to decide which crossover to use overtime
@@ -584,6 +585,51 @@ ra
 ;; <-
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+(comment
+"Bit string mutation
+The mutation of bit strings ensue through bit flips at random positions.
+
+This mutation operator takes the chosen genome and inverts the bits (i.e. if the genome bit is 1, it is changed to 0 and vice versa).
+
+Non-Uniform
+The probability that amount of mutation will go to 0 with the next generation is increased by using non-uniform mutation operator. It keeps the population from stagnating in the early stages of the evolution. It tunes solution in later stages of evolution. This mutation operator can only be used for integer and float genes.
+
+Uniform
+This operator replaces the value of the chosen gene with a uniform random value selected between the user-specified upper and lower bounds for that gene. This mutation operator can only be used for integer and float genes.
+
+Gaussian
+This operator adds a unit Gaussian distributed random value to the chosen gene. If it falls outside of the user-specified lower or upper bounds for that gene, the new gene value is clipped. This mutation operator can only be used for integer and float genes.
+
+Shrink
+This operator adds a random number taken from a Gaussian distribution with mean equal to the original value of each decision variable characterizing the entry parent vector.")
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;; a new gene pool
+(def gene-pool 
+  list )
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/gene-pool</span>","value":"#'gp.propel-ast/gene-pool"}
+;; <=
+
+;; @@
+(defn bit-mutation
+  "see definition above.bMutation rate [0 1)"
+  [plushy mutation-rate]
+  (map #(if (<= (rand) mutation-rate)
+             (rand-nth instructions)
+             %) 
+       plushy))
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/bit-mutation</span>","value":"#'gp.propel-ast/bit-mutation"}
 ;; <=
 
 ;; @@
