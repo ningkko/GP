@@ -6,7 +6,7 @@
 ;; **
 
 ;; @@
-(ns gp.propel-ast
+(ns helperfn
   (:require [gorilla-plot.core :as plot]
    			[propel.core :refer :all]
    			[clojure-csv.core :refer :all]))
@@ -20,7 +20,7 @@
 (rand-nth [true false])
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-unkown'>true</span>","value":"true"}
+;;; {"type":"html","content":"<span class='clj-unkown'>false</span>","value":"false"}
 ;; <=
 
 ;; @@
@@ -243,6 +243,10 @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
+
+;; @@
+
+;; @@
 
 ;; @@
 

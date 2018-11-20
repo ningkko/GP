@@ -6,7 +6,7 @@
 ;; **
 
 ;; @@
-(ns gp.propel-ast
+(ns discarded
   (:require [gorilla-plot.core :as plot]
    			[propel.core :refer :all]
    			[clojure-csv.core :refer :all]))
@@ -89,6 +89,14 @@
 ;; =>
 ;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>plus</span>","value":"plus"},{"type":"html","content":"<span class='clj-symbol'>integer_+</span>","value":"integer_+"},{"type":"html","content":"<span class='clj-symbol'>minus</span>","value":"minus"}],"value":"(plus integer_+ minus)"}
 ;; <=
+
+;; @@
+
+;; @@
+
+;; @@
+
+;; @@
 
 ;; @@
 
