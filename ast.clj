@@ -6,12 +6,14 @@
 ;;; #### TODO
 ;;; 1. Readin data (Done)
 ;;; 2. Get input data & target data (Done)
-;;; 2. crossover (Testing)
-;;; 2. mutation (if error > C, flip bit?)
-;;; 2. Error function
-;;; 3. Simple GP
-;;; 4. function to decide which crossover to use overtime
-;;; 4. lexicase
+;;; 3. crossover (Testing)
+;;; 4. mutation (if error > C, flip bit?)
+;;; 5. Error function
+;;; 6. Simple GP
+;;; 7. function to decide which crossover to use overtime
+;;; 8. tournament->lexicase
+;;; 
+;;; 
 ;;; 
 ;;; 
 ;; **
@@ -112,10 +114,11 @@
   data-names
   (range 12))
 
+(comment
 ;; v2
 (doseq [n data-names number (range 12)] 
   (def n 
-    (vec (get-target-data "src/training_set_metadata.csv" number))))
+    (vec (get-target-data "src/training_set_metadata.csv" number)))))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
@@ -144,10 +147,6 @@ ra
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
-
-;; @@
-
-;; @@
 
 ;; @@
 
@@ -320,7 +319,7 @@ ra
                index)))) 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;user/multi-point-crossover-parallel-even</span>","value":"#'user/multi-point-crossover-parallel-even"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/multi-point-crossover-parallel-even</span>","value":"#'gp.propel-ast/multi-point-crossover-parallel-even"}
 ;; <=
 
 ;; @@
@@ -385,7 +384,7 @@ ra
 
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>-2</span>","value":"-2"},{"type":"html","content":"<span class='clj-long'>-1</span>","value":"-1"},{"type":"html","content":"<span class='clj-long'>0</span>","value":"0"}],"value":"(-2 -1 0)"}
+;;; {"type":"html","content":"<span class='clj-long'>3</span>","value":"3"}
 ;; <=
 
 ;; @@
@@ -560,6 +559,11 @@ ra
 
 
 ;; @@
+;; ->
+;;; Both the values are equal
+;;; true
+;;; 
+;; <-
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
@@ -631,7 +635,3 @@ This operator adds a random number taken from a Gaussian distribution with mean 
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/bit-mutation</span>","value":"#'gp.propel-ast/bit-mutation"}
 ;; <=
-
-;; @@
-
-;; @@
