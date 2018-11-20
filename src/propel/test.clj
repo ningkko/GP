@@ -339,18 +339,17 @@
 
 ;;------------------------------test-----------------------------
 
+;; low probability
 (defn crossover
-  "multi-point-crossover-parallel-interleaving:= Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
+  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
   take odd genomes, uniform sized
   a-2+b-2+a-4+b-4+...+a_left+b_left"
   
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
-        longer (if (counted? plushy-a)
-                 (max-key count plushy-b plushy-a)
-                 (if (= shorter plushy-a)
+        longer (if (= shorter plushy-a)
                    plushy-b
-                   plushy-a))
+                   plushy-a)
         length (count longer) ;;length of genes
         ;;at least 2 chunks'
         chunk-number (+ 2 (rand-int (dec length)))
@@ -359,15 +358,11 @@
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))
         segmented-a (map vec (partition-all chunk-size plushy-a))
         segmented-b (map vec (partition-all chunk-size plushy-b))
-        index (range (count segmented-a))]
+        index (vec (filter odd? (range (count segmented-a))))]
     
      (remove #(= % :crossover-padding) 
              (mapcat 
-               #(nth 
-                  (if (even? %)
-                    segmented-a
-                    segmented-b)
-                  %)
+               #(concat (nth segmented-a %) (nth segmented-b %)) 
                index)))) 
 
 ;;-----------------------------------------------------------------
@@ -543,11 +538,11 @@
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 0
 ;;; -------------------------------------------------------
-;;; Best plushy: (0 in1 string_absolute 1 boolean_not string_concat integer_= string_take string_length string_reverse exec_if string_take boolean_is-positive integer_+ string_includes? boolean_is-negative string_take string_drop integer_- boolean_or 0 1 boolean_is-positive boolean_= integer_% string_concat in1 false string_absolute string_length string_concat string_length integer_* 1 string_absolute close string_= in1 boolean_or)
-;;; Best program: (0 in1 string_absolute 1 boolean_not string_concat integer_= string_take string_length string_reverse exec_if (string_take boolean_is-positive integer_+ string_includes? boolean_is-negative string_take string_drop integer_- boolean_or 0 1 boolean_is-positive boolean_= integer_% string_concat in1 false string_absolute string_length string_concat string_length integer_* 1 string_absolute) (string_= in1 boolean_or))
-;;; Best total error: 6055
-;;; Best errors: (997 726 509 340 213 122 61 24 5 0 3 4 11 30 67 128 219 346 515 732 1003)
-;;; Best behaviors: (-10 -9 -8 -7 -6 -5 -4 -3 -2 1 0 1 2 3 4 5 6 7 8 9 10)
+;;; Best plushy: (string_drop exec_dup string_length integer_- integer_% string_take 1 exec_if exec_if string_includes? integer_= boolean_is-negative string_concat 1 exec_if exec_dup string_concat string_includes? string_length integer_+ integer_= string_concat boolean_or boolean_and integer_= string_absolute true in1 string_reverse integer_* integer_= boolean_and)
+;;; Best program: (string_drop exec_dup (string_length integer_- integer_% string_take 1 exec_if (exec_if (string_includes? integer_= boolean_is-negative string_concat 1 exec_if (exec_dup (string_concat string_includes? string_length integer_+ integer_= string_concat boolean_or boolean_and integer_= string_absolute true in1 string_reverse integer_* integer_= boolean_and)) ()) ()) ()))
+;;; Best total error: 5397
+;;; Best errors: (907 654 453 298 183 102 49 18 3 2 3 4 9 24 55 108 189 304 459 660 913)
+;;; Best behaviors: (-100 -81 -64 -49 -36 -25 -16 -9 -4 -1 0 1 4 9 16 25 36 49 64 81 100)
 ;;; 
 ;;; 
 ;; <-

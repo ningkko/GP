@@ -75,11 +75,9 @@
   
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
-        longer (if (counted? plushy-a)
-                 (max-key count plushy-b plushy-a)
-                 (if (= shorter plushy-a)
+        longer (if (= shorter plushy-a)
                    plushy-b
-                   plushy-a))
+                   plushy-a)
         length (count longer) ;;length of genes
         ;; at least 2 chunks
         chunk-number (+ 2 (rand-int (dec length)))
@@ -103,35 +101,35 @@
 )
 ;; @@
 ;; ->
+;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
+;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
 ;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
 ;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
 ;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
 ;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; 
 ;; <-
@@ -143,15 +141,13 @@
 (defn multi-point-crossover-parallel-interleaving
   "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
   take odd genomes, uniform sized
-  a-2+b-2+a-4+b-4+...+a_left+b_left"
+  a-1+b-2+a-3+b-4+...+a_left+b_left"
   
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
-        longer (if (counted? plushy-a)
-                 (max-key count plushy-b plushy-a)
-                 (if (= shorter plushy-a)
+        longer (if (= shorter plushy-a)
                    plushy-b
-                   plushy-a))
+                   plushy-a)
         length (count longer) ;;length of genes
         ;;at least 2 chunks'
         chunk-number (+ 2 (rand-int (dec length)))
@@ -181,36 +177,109 @@
 )
 ;; @@
 ;; ->
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ string_- Integer_* Integer_% string_+ string_- Integer_* Integer_% test1 test2)
-;;; (string_+ string_- Integer_* Integer_% string_+ string_- Integer_* Integer_% test1 test2)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ string_- Integer_* Integer_% string_+ string_- Integer_* Integer_% test1 test2)
-;;; (string_+ string_- Integer_* Integer_% string_+ string_- Integer_* Integer_% test1 test2)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ string_- string_* string_% string_+ Integer_- Integer_* Integer_% test2 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- string_* Integer_% Ineger_+ Integer_- string_* string_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ Integer_- string_* Integer_% string_+ Integer_- string_* Integer_% test1 test1)
-;;; (string_+ string_- Integer_* Integer_% string_+ string_- Integer_* Integer_% test1 test2)
-;;; (string_+ string_- Integer_* Integer_% string_+ string_- Integer_* Integer_% test1 test2)
+;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; 
+;; <-
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+;; low probability
+(defn multi-point-crossover-parallel-even
+  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
+  take odd genomes, uniform sized
+  a-2+b-2+a-4+b-4+...+a_left+b_left"
+  
+  [plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a)
+        length (count longer) ;;length of genes
+        ;;at least 2 chunks'
+        chunk-number (+ 2 (rand-int (dec length)))
+        chunk-size (int (/ length chunk-number))
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))
+        segmented-a (map vec (partition-all chunk-size plushy-a))
+        segmented-b (map vec (partition-all chunk-size plushy-b))
+        index (vec (filter odd? (range (count segmented-a))))]
+    
+     (remove #(= % :crossover-padding) 
+             (mapcat 
+               #(concat (nth segmented-a %) (nth segmented-b %)) 
+               index)))) 
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/multi-point-crossover-parallel-even</span>","value":"#'gp.propel-ast/multi-point-crossover-parallel-even"}
+;; <=
+
+;; @@
+(dotimes [n 30]
+ (println (multi-point-crossover-parallel-even plushy-a plushy-b))
+)
+;; @@
+;; ->
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
 ;;; 
 ;; <-
 ;; =>
@@ -242,7 +311,47 @@
 ;; <=
 
 ;; @@
+;;didn't work, a documentation. 
+;;And randomized multipoint crossover works the same as uniform crossover.
+(comment
+  (defn k-point-crossover-randomsized
+    ""
+    [point-number plushy-a plushy-b]
+    (let [shorter (min-key count plushy-a plushy-b)
+          longer (if (counted? plushy-a)
+                   (max-key count plushy-b plushy-a)
+                   (if (= shorter plushy-a)
+                     plushy-b
+                     plushy-a))
+          target-length (count longer)
+          new-gene-length (atom 0) ;; length of the new gene
+          point-left (atom point-number)
+          times (atom 0)
+          length-diff (- target-length (count shorter))
+          shorter-padded (concat shorter (repeat length-diff :crossover-padding))]
 
+      (remove #(= % :crossover-padding)
+              (concat
+                (while 
+                  (< new-gene-length target-length)
+                  (do
+                    (apply
+                      #(let [chunk-size (+ 1 (rand-int (- (count %1) point-left 1 1)))]
+                        (doall
+                          (take chunk-size %1)
+                          (drop chunk-size %1)
+                          (drop chunk-size %2))
+                        (if (even? times) 
+                          [plushy-a
+                           plushy-b]
+                          [plushy-b
+                           plushy-a]))) 
+
+                    (swap! point-left dec)
+                    (swap! times inc)))
+                plushy-a
+                plushy-b))))
+  )
 ;; @@
 
 ;; @@
