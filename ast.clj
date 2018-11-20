@@ -228,11 +228,9 @@ ra
 ;; <=
 
 ;; @@
-;; low possibility
-(defn multi-point-crossover-parallel-odd
+(defn multi-point-crossover-parallel
   "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
-  take odd genomes, uniform sized
-  a-1+b-1+a-3+b-3+...+a_left+b_left"
+  take odd genomes, uniform sized"
   
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
@@ -245,14 +243,25 @@ ra
         length-diff (- (count longer) (count shorter))
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))
         segmented-a (map vec (partition-all chunk-size plushy-a))
-        segmented-b (map vec (partition-all chunk-size plushy-b))
-        index (vec (filter even? (range (count segmented-a))))]
+        segmented-b (map vec (partition-all chunk-size plushy-b))]
     
-     (remove #(= % :crossover-padding) 
-             (mapcat 
-               #(concat (nth segmented-a %) (nth segmented-b %)) 
-               index)))) 
-	
+    (loop [start-at-0th (rand-nth [true false])
+           a (if (start-at-0th)
+               segmented-a
+               (rest segmented-a))
+           b (if (start-at-0th)
+               segmented-b
+               (rest segmented-b))
+           result []]
+        
+      (if (empty? a)
+        (remove #(= % :crossover-padding) result)
+        (recur (start-at-0th)
+               (rest (rest a))
+               (rest (rest b))
+               (conj result (first a) (first b))))))) 
+
+
     
 ;;high P
 (defn multi-point-crossover-parallel-interleaving
@@ -272,271 +281,29 @@ ra
         length-diff (- (count longer) (count shorter))
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))
         segmented-a (map vec (partition-all chunk-size plushy-a))
-        segmented-b (map vec (partition-all chunk-size plushy-b))
-        index (range (count segmented-a))]
+        segmented-b (map vec (partition-all chunk-size plushy-b))]  
     
-     (remove #(= % :crossover-padding) 
-             (mapcat 
-               #(nth 
-                  (if (even? %)
-                    segmented-a
-                    segmented-b)
-                  %)
-               index)))) 
-	
-    
-    
-;; low probability
-(defn multi-point-crossover-parallel-even
-  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
-  take odd genomes, uniform sized
-  a-2+b-2+a-4+b-4+...+a_left+b_left"
-  
-  [plushy-a plushy-b]
-  (let [shorter (min-key count plushy-a plushy-b)
-        longer (if (= shorter plushy-a)
-                   plushy-b
-                   plushy-a)
-        length (count longer) ;;length of genes
-        ;;at least 2 chunks'
-        chunk-number (+ 2 (rand-int (dec length)))
-        chunk-size (int (/ length chunk-number))
-        length-diff (- (count longer) (count shorter))
-        shorter-padded (concat shorter (repeat length-diff :crossover-padding))
-        segmented-a (map vec (partition-all chunk-size plushy-a))
-        segmented-b (map vec (partition-all chunk-size plushy-b))
-        index (vec (filter odd? (range (count segmented-a))))]
-    
-     (remove #(= % :crossover-padding) 
-             (mapcat 
-               #(concat (nth segmented-a %) (nth segmented-b %)) 
-               index)))) 
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/multi-point-crossover-parallel-even</span>","value":"#'gp.propel-ast/multi-point-crossover-parallel-even"}
-;; <=
+    (loop [start-at-0th (rand-nth [true false])
+           a (if (start-at-0th)
+               segmented-a
+               (rest segmented-a))
+           b (if (start-at-0th)
+               segmented-b
+               (rest segmented-b))
+           result []]
+        
+      (if (empty? a)
+        (remove #(= % :crossover-padding) result)
+        (recur (start-at-0th)
+               (rest (rest a))
+               (rest (rest b))
+               (conj result (first a) (first b))))))) 
 
-;; @@
-;;apply
-(apply #(inc %) [1])
+
 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-long'>2</span>","value":"2"}
-;; <=
-
-;; @@
-;;min-key
-;;min-key apply a function and return the one with least value
-(min-key abs -8 3 4 5)
-
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-long'>3</span>","value":"3"}
-;; <=
-
-;; @@
-(comment
-  (def instruction ['plus 'minus 'integer_+])
-  (type 
-    (nth 
-      (repeatedly ;;repeats functions
-        (+ 1 (rand-int (count instruction))) 
-        #(rand-nth instruction)) 0)))
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-;; take first half of the first laziseq
-;; and the second half of the second lazy seq
-(comment
-  (def instruction ['plus 'minus 'integer_+])
-  (def instruction2 ['plus 'integer_+ 'minus])
-
-  (let [length (count instruction) 
-        mid (int (/ length 2))]
-    (if (even? length)
-      (concat (take mid instruction)
-              (take-last mid instruction2))
-      (concat (take mid instruction)
-              (take-last (+ mid 1) instruction2)))))
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-;;atom, swap!, @
-(def a (atom 1))
-(type a)
-(type @a)
-(swap! a inc)
-
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-long'>2</span>","value":"2"}
-;; <=
-
-;; @@
-;; while
-(def a (atom 10))                                
-(while 
-  (pos? @a) 
-  (do 
-    (println @a) 
-    (swap! a dec)))
-
-
-;; @@
-;; ->
-;;; 10
-;;; 9
-;;; 8
-;;; 7
-;;; 6
-;;; 5
-;;; 4
-;;; 3
-;;; 2
-;;; 1
-;;; 
-;; <-
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-;;dotimes
-(defn Example []
-   (dotimes [n 5]
-   (println n)))
-(Example)
-;; @@
-;; ->
-;;; 0
-;;; 1
-;;; 2
-;;; 3
-;;; 4
-;;; 
-;; <-
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-
-;;loop
-
-(defn Example []
-  (loop [x 10]
-    (when (> x 1)
-      (println x)
-      (recur (- x 2))))) 
-(Example)
-
-;; @@
-;; ->
-;;; 10
-;;; 8
-;;; 6
-;;; 4
-;;; 2
-;;; 
-;; <-
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-;;doseq
-
-(defn Example []
-  (doseq [n [0 1 2]]
-    (println n)))
-(Example)
-
-
-;; @@
-;; ->
-;;; 0
-;;; 1
-;;; 2
-;;; 
-;; <-
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-
-;;while
-(defn Example []
-   (def x (atom 1)) ;;atom, changable variable
-   (while ( < @x 5 ) ;;@gets its value
-      (do
-         (println @x)
-         (swap! x inc)))) ;; swap changes its value
-(Example)
-
-;; @@
-;; ->
-;;; 1
-;;; 2
-;;; 3
-;;; 4
-;;; 
-;; <-
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-
-;; if do
-;;"do multi-task under each condition"
-(defn Example [] (
-                   if (= 2 2)
-                   (do(println "Both the values are equal")
-                     (println "true"))
-                   (do(println "Both the values are not equal")
-                     (println "false"))))
-(Example)
-
-
-;; @@
-;; ->
-;;; Both the values are equal
-;;; true
-;;; 
-;; <-
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-
-;;case
-(defn Example []
-   (def x 5) 
-   (case x 
-     10 (println "x is 10")
-     2 (println "x is 2")
-     odd? (println "x is odd") ;; only case numbers, will not print this line
-     5 (println "x is 5")
-     (println "x is neither 5 nor 10")))
-
-(Example)
-
-;; @@
-;; ->
-;;; x is 5
-;;; 
-;; <-
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;user/multi-point-crossover-parallel-even</span>","value":"#'user/multi-point-crossover-parallel-even"}
 ;; <=
 
 ;; @@
@@ -560,15 +327,6 @@ This operator adds a random number taken from a Gaussian distribution with mean 
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-;; a new gene pool
-(def gene-pool 
-  list )
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.propel-ast/gene-pool</span>","value":"#'gp.propel-ast/gene-pool"}
 ;; <=
 
 ;; @@
