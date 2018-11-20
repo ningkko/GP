@@ -91,12 +91,41 @@
 ;; <=
 
 ;; @@
+;;no need of binding data to global variable
+;;also def is a macro and what should be at %1 is symbol but not string
+;; bind input data name to data
+(comment
+  (doall;; forces lazysequences to be evaluated
+  (map 
+  	#(def %1 
+  	   (vec (get-target-data "src/training_set_metadata.csv" %2)))
+  	data-names
+  	(range 12))))
 
-;; @@
+(comment
+;; v2
+(doseq [n data-names number (range 12)] 
+  (def n 
+    (vec (get-target-data "src/training_set_metadata.csv" number))))
 
-;; @@
+;;brutal-force biding
+(def ra (vec (get-target-data "src/training_set_metadata.csv" 1)))
+(def decl (vec (get-target-data "src/training_set_metadata.csv" 2)))
+(def gal_l (vec (get-target-data "src/training_set_metadata.csv" 3)))
+(def gal_b (vec (get-target-data "src/training_set_metadata.csv" 4)))
+(def ddf (vec (get-target-data "src/training_set_metadata.csv" 5)))
+(def hostgal_specz (vec (get-target-data "src/training_set_metadata.csv" 6)))
+(def hostgal_photoz (vec (get-target-data "src/training_set_metadata.csv" 7)))
+(def hostgal_photoz_err (vec (get-target-data "src/training_set_metadata.csv" 8)))
+(def distmod (vec (get-target-data "src/training_set_metadata.csv" 9)))
+(def mwebv (vec (get-target-data "src/training_set_metadata.csv" 10)))
 
+
+)
 ;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
 
 ;; @@
 

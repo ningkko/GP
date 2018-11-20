@@ -49,23 +49,27 @@
 ;; <=
 
 ;; @@
-(defn read-column [filename column-index]
+(defn read-column 
+  [filename column-index]
   (with-open [reader (io/reader filename)]
     (let [data (csv/read-csv reader)]
       (doall
         (map #(nth % column-index) data)))))
 
-
+(defn read-row 
+  [filename row-index]
+  (with-open [reader (io/reader filename)]
+      (nth (csv/read-csv reader) row-index)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/read-column</span>","value":"#'ast/read-column"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/read-row</span>","value":"#'ast/read-row"}
 ;; <=
 
 ;; @@
-(type (readin-data "src/training_set_metadata.csv"))
+(def filename "src/training_set_metadata.csv")
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.LazySeq</span>","value":"clojure.lang.LazySeq"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/filename</span>","value":"#'ast/filename"}
 ;; <=
 
 ;; @@
@@ -96,43 +100,10 @@
 ;; <=
 
 ;; @@
-;; bind input data name to data
-(map 
-  #(def %1 
-     (vec (get-target-data "src/training_set_metadata.csv" %2)))
-  data-names
-     (range 12))
-
-(comment
-;; v2
-(doseq [n data-names number (range 12)] 
-  (def n 
-    (vec (get-target-data "src/training_set_metadata.csv" number)))))
+(read-row data 1)
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-ddf
-
-;; @@
-
-;; @@
-;;brutal-force biding
-(def ra (vec (get-target-data "src/training_set_metadata.csv" 1)))
-(def decl (vec (get-target-data "src/training_set_metadata.csv" 2)))
-(def gal_l (vec (get-target-data "src/training_set_metadata.csv" 3)))
-(def gal_b (vec (get-target-data "src/training_set_metadata.csv" 4)))
-(def ddf (vec (get-target-data "src/training_set_metadata.csv" 5)))
-(def hostgal_specz (vec (get-target-data "src/training_set_metadata.csv" 6)))
-(def hostgal_photoz (vec (get-target-data "src/training_set_metadata.csv" 7)))
-(def hostgal_photoz_err (vec (get-target-data "src/training_set_metadata.csv" 8)))
-(def distmod (vec (get-target-data "src/training_set_metadata.csv" 9)))
-(def mwebv (vec (get-target-data "src/training_set_metadata.csv" 10)))
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/mwebv</span>","value":"#'ast/mwebv"}
+;;; {"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-string'>&quot;615&quot;</span>","value":"\"615\""},{"type":"html","content":"<span class='clj-string'>&quot;349.046051&quot;</span>","value":"\"349.046051\""},{"type":"html","content":"<span class='clj-string'>&quot;-61.943836&quot;</span>","value":"\"-61.943836\""},{"type":"html","content":"<span class='clj-string'>&quot;320.796530&quot;</span>","value":"\"320.796530\""},{"type":"html","content":"<span class='clj-string'>&quot;-51.753706&quot;</span>","value":"\"-51.753706\""},{"type":"html","content":"<span class='clj-string'>&quot;1&quot;</span>","value":"\"1\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;nan&quot;</span>","value":"\"nan\""},{"type":"html","content":"<span class='clj-string'>&quot;0.017&quot;</span>","value":"\"0.017\""},{"type":"html","content":"<span class='clj-string'>&quot;92&quot;</span>","value":"\"92\""}],"value":"[\"615\" \"349.046051\" \"-61.943836\" \"320.796530\" \"-51.753706\" \"1\" \"0.0000\" \"0.0000\" \"0.0000\" \"nan\" \"0.017\" \"92\"]"}
 ;; <=
 
 ;; @@

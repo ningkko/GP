@@ -1,7 +1,7 @@
 ;; gorilla-repl.fileformat = 1
 
 ;; @@
-(ns propel.core
+(ns propel-test
   (:gen-class))
 
 (def example-push-state
@@ -22,13 +22,15 @@
     'integer_*
     'integer_%
     'integer_=
+    'integer_absolute
+    'integer_sqrt
     'exec_dup
     'exec_if
     'boolean_and
     'boolean_or
     'boolean_not
-    'boolean_is-negative
-    'boolean_is-positive
+    'boolean_negative
+    'boolean_positive
     'boolean_=
     'string_=
     'string_take
@@ -36,7 +38,6 @@
     'string_reverse
     'string_concat
     'string_length
-    'string_absolute
     'string_includes?
     'close
     0
@@ -229,6 +230,35 @@
   [state]
   (make-push-instruction state clojure.string/includes? [:string :string] :boolean))
 
+(defn integer_absolute
+  [state]
+  (make-push-instruction state
+                         #(max % (- %))
+                         [:integer]
+                         :integer))
+
+(defn boolean_negative
+  [state]
+  (make-push-instruction state
+                         #(neg? %)
+                         [:integer]
+                         :boolean))
+
+
+(defn boolean_positive
+  [state]
+  (make-push-instruction state
+                         #(pos? %)
+                         [:integer]
+                         :boolean))
+
+(defn integer_sqrt
+  [state]
+  (make-push-instruction state
+                         #(Math/sqrt %)
+                         [:integer]
+                         :integer))
+
 
 
 ;;;;;;;;;
@@ -318,32 +348,39 @@
 
 ;;------------------------------test-----------------------------
 
-;; low probability
+
 (defn crossover
-  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
-  take odd genomes, uniform sized
-  a-2+b-2+a-4+b-4+...+a_left+b_left"
-  
+  "a1-b1-a3-b3-... or a-2-b2-a4-b4-..."
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (= shorter plushy-a)
                    plushy-b
                    plushy-a)
         length (count longer) ;;length of genes
-        ;;at least 2 chunks'
-        chunk-number (+ 2 (rand-int (dec length)))
+        chunk-number (+ 1 (rand-int length))
         chunk-size (int (/ length chunk-number))
         length-diff (- (count longer) (count shorter))
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))
         segmented-a (map vec (partition-all chunk-size plushy-a))
-        segmented-b (map vec (partition-all chunk-size plushy-b))
-        index (vec (filter odd? (range (count segmented-a))))]
+        segmented-b (map vec (partition-all chunk-size plushy-b))]
     
-     (remove #(= % :crossover-padding) 
-             (mapcat 
-               #(concat (nth segmented-a %) (nth segmented-b %)) 
-               index)))) 
+    (loop [start-at-0th (rand-nth [true false])
+           a (if start-at-0th
+               segmented-a
+               (rest segmented-a))
+           b (if start-at-0th
+               segmented-b
+               (rest segmented-b))
+           result []]
+        
+      (if (empty? a)
+        (remove #(= % :crossover-padding) result)
+        (recur start-at-0th
+               (rest (rest a))
+               (rest (rest b))
+               (concat result (first a) (first b))))))) 
 
+   
 ;;-----------------------------------------------------------------
 
 
@@ -504,25 +541,17 @@
 
 
 
+
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;propel.core/-main</span>","value":"#'propel.core/-main"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;propel-test/-main</span>","value":"#'propel-test/-main"}
 ;; <=
 
 ;; @@
 (-main)
 ;; @@
 ;; ->
-;;; Starting GP with args: {:instructions (in1 integer_+ integer_- integer_* integer_% integer_= exec_dup exec_if boolean_and boolean_or boolean_not boolean_is-negative boolean_is-positive boolean_= string_= string_take string_drop string_reverse string_concat string_length string_absolute string_includes? close 0 1 true false), :error-function #function[propel.core/regression-error-function], :max-generations 500, :population-size 200, :max-initial-plushy-size 50, :step-limit 100}
-;;; -------------------------------------------------------
-;;;                Report for Generation 0
-;;; -------------------------------------------------------
-;;; Best plushy: (close boolean_or in1 boolean_not integer_= boolean_and string_drop integer_% boolean_is-positive string_drop string_reverse in1 true string_absolute string_length string_= integer_= exec_dup boolean_= boolean_is-negative integer_+ boolean_is-negative false boolean_is-negative in1 false integer_% integer_= exec_dup 1 in1 boolean_or integer_* integer_+ close string_concat)
-;;; Best program: (boolean_or in1 boolean_not integer_= boolean_and string_drop integer_% boolean_is-positive string_drop string_reverse in1 true string_absolute string_length string_= integer_= exec_dup (boolean_= boolean_is-negative integer_+ boolean_is-negative false boolean_is-negative in1 false integer_% integer_= exec_dup (1 in1 boolean_or integer_* integer_+) string_concat))
-;;; Best total error: 5841
-;;; Best errors: (977 708 493 326 201 112 53 18 1 4 3 2 7 24 59 118 207 332 499 714 983)
-;;; Best behaviors: (-30 -27 -24 -21 -18 -15 -12 -9 -6 -3 0 3 6 9 12 15 18 21 24 27 30)
-;;; 
+;;; Starting GP with args: {:instructions (in1 integer_+ integer_- integer_* integer_% integer_= integer_absolute integer_sqrt exec_dup exec_if boolean_and boolean_or boolean_not boolean_negative boolean_positive boolean_= string_= string_take string_drop string_reverse string_concat string_length string_includes? close 0 1 true false), :error-function #function[propel-test/regression-error-function], :max-generations 500, :population-size 200, :max-initial-plushy-size 50, :step-limit 100}
 ;;; 
 ;; <-
 
