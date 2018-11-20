@@ -21,5 +21,4 @@ Mutation\
 -> https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm) \
 ->IMPROVING MUTATION CAPABILITIES IN A REAL - CODED GENETIC ALGORITHM\
  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.41.6687&rep=rep1&type=pdf \
--> Evolutionary Programming Based on Non-Uniform Mutation\
-http://mmrc.iss.ac.cn/mm/mm23/MMpreprintÕÔÐÂ³¬.pdf
+-> Evolutionary Programming Based on Non-Uniform Mutation
