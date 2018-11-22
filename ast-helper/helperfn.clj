@@ -245,8 +245,55 @@
 ;; <=
 
 ;; @@
+(Math/abs -1)
+(Math/PI)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-double'>3.141592653589793</span>","value":"3.141592653589793"}
+;; <=
 
 ;; @@
+(Math/E)
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-double'>2.718281828459045</span>","value":"2.718281828459045"}
+;; <=
+
+;; @@
+(Math/cbrt 3)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-double'>1.4422495703074083</span>","value":"1.4422495703074083"}
+;; <=
+
+;; @@
+(type 0.1)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-class'>java.lang.Double</span>","value":"java.lang.Double"}
+;; <=
+
+;; @@
+(range -10.0 11.0)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-unkown'>(-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)</span>","value":"(-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)"}
+;; <=
+
+;; @@
+(quot 1.0 1.1)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-double'>0.0</span>","value":"0.0"}
+;; <=
+
+;; @@
+(zero? 0.0)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-unkown'>true</span>","value":"true"}
+;; <=
 
 ;; @@
 
