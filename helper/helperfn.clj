@@ -6,10 +6,7 @@
 ;; **
 
 ;; @@
-(ns helperfn
-  (:require [gorilla-plot.core :as plot]
-   			[propel.core :refer :all]
-   			[clojure-csv.core :refer :all]))
+(ns helperfn)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
@@ -275,10 +272,10 @@
 ;; <=
 
 ;; @@
-(range -10.0 11.0)
+(seq? (range -10.0 11.0))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-unkown'>(-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)</span>","value":"(-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)"}
+;;; {"type":"html","content":"<span class='clj-unkown'>true</span>","value":"true"}
 ;; <=
 
 ;; @@
@@ -293,6 +290,13 @@
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>true</span>","value":"true"}
+;; <=
+
+;; @@
+(list '(1 2 3))
+;; @@
+;; =>
+;;; {"type":"list-like","open":"<span class='clj-list'>(</span>","close":"<span class='clj-list'>)</span>","separator":" ","items":[{"type":"list-like","open":"<span class='clj-list'>(</span>","close":"<span class='clj-list'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>1</span>","value":"1"},{"type":"html","content":"<span class='clj-long'>2</span>","value":"2"},{"type":"html","content":"<span class='clj-long'>3</span>","value":"3"}],"value":"(1 2 3)"}],"value":"((1 2 3))"}
 ;; <=
 
 ;; @@

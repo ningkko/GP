@@ -1,7 +1,7 @@
 ;; gorilla-repl.fileformat = 1
 
 ;; **
-;;; # ast-test
+;;; # asttest
 ;;; 1. tournament (+)
 ;;; 2. uniform-crossover (+)
 ;;; 3. multipoint crossover (-)

@@ -37,15 +37,13 @@
 ;; <=
 
 ;; @@
-(defn readin-data
-  [file-name]
-  (with-open [reader (io/reader file-name)]
-  (doall
-    (csv/read-csv reader))))
-;c
+(defn read-row 
+  [filename row-index]
+  (with-open [reader (io/reader filename)]
+     (csv/read-csv reader)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/readin-data</span>","value":"#'ast/readin-data"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/read-row</span>","value":"#'ast/read-row"}
 ;; <=
 
 ;; @@
@@ -73,7 +71,7 @@
 ;; <=
 
 ;; @@
-;;(apply #(nth % 11) (readin-data "src/training_set_metadata.csv"))
+
 ;; @@
 
 ;; @@
@@ -100,15 +98,12 @@
 ;; <=
 
 ;; @@
-(read-row filename 1)
+(map #(flatten (list (read-row filename %))) (map inc (range (dec (count (read-column filename 0))))))
 ;; @@
-;; =>
-;;; {"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-string'>&quot;615&quot;</span>","value":"\"615\""},{"type":"html","content":"<span class='clj-string'>&quot;349.046051&quot;</span>","value":"\"349.046051\""},{"type":"html","content":"<span class='clj-string'>&quot;-61.943836&quot;</span>","value":"\"-61.943836\""},{"type":"html","content":"<span class='clj-string'>&quot;320.796530&quot;</span>","value":"\"320.796530\""},{"type":"html","content":"<span class='clj-string'>&quot;-51.753706&quot;</span>","value":"\"-51.753706\""},{"type":"html","content":"<span class='clj-string'>&quot;1&quot;</span>","value":"\"1\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;nan&quot;</span>","value":"\"nan\""},{"type":"html","content":"<span class='clj-string'>&quot;0.017&quot;</span>","value":"\"0.017\""},{"type":"html","content":"<span class='clj-string'>&quot;92&quot;</span>","value":"\"92\""}],"value":"[\"615\" \"349.046051\" \"-61.943836\" \"320.796530\" \"-51.753706\" \"1\" \"0.0000\" \"0.0000\" \"0.0000\" \"nan\" \"0.017\" \"92\"]"}
-;; <=
 
 ;; @@
 (defn tournament-selection-revised
-  "Elements are sorted according to their erropr first and then the first half will be taken. After which 1/10 of them will be selected"
+  "Elements are sorted according to their error first and then the first half will be taken. After which 1/10 of them will be selected"
   [pop]
   (let [half-size (/ (count pop) 2)
         tournament-set (take half-size (apply min-key :total-error pop))
