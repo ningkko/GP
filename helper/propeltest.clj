@@ -4,6 +4,10 @@
 (ns propeltest
   (:gen-class))
 
+
+(def data-addr "src/training_set_metadata.csv")
+
+
 (def example-push-state
   {:exec '()
    :float '(1.0 2.0 3.0 4.0 5.0 6.0 7.0)
@@ -27,8 +31,8 @@
     false
   ;;============== new functions ================
    
-    pi
-    e
+    'pi
+    'e
     'boolean_negative
     'boolean_positive
     ;;'float_floatify
@@ -49,9 +53,16 @@
 ;;;;;;;;;
 ;; Utilities
 
+(defn get-target
+  [file-name]
+  (doall
+    (map #(float (read-string %))
+         (rest (read-column file-name 11)))))
+
+
 (def empty-push-state
   {:exec '()
-   :integer '()
+   :float '()
    :string '()
    :boolean '()
    :input {}})
@@ -409,21 +420,22 @@
            max-initial-plushy-size]
     :as argmap}]
   (println "Starting GP with args:" argmap)
-  (loop [generation 0
-         population (repeatedly
-                     population-size
-                     #(hash-map :plushy
-                                (make-random-plushy instructions
-                                                    max-initial-plushy-size)))]
-    (let [evaluated-pop (sort-by :total-error 
-                                 (map (partial error-function argmap)
-                                      population))]
-      (report evaluated-pop generation)
-      (cond
-        (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
-        (>= generation max-generations) nil
-        :else (recur (inc generation)
-                     (repeatedly population-size #(select-and-vary evaluated-pop) cases))))))
+  (let [cases ]
+    (loop [generation 0
+           population (repeatedly
+                       population-size
+                       #(hash-map :plushy
+                                  (make-random-plushy instructions
+                                                      max-initial-plushy-size)))]
+      (let [evaluated-pop (sort-by :total-error 
+                                   (map (partial error-function argmap)
+                                        population))]
+        (report evaluated-pop generation)
+        (cond
+          (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
+          (>= generation max-generations) nil
+          :else (recur (inc generation)
+                       (repeatedly population-size #(select-and-vary evaluated-pop cases))))))))
 
 ;;;;;;;;;
 ;; Problem: f(x) = 7x^2 - 20x + 13
@@ -446,15 +458,15 @@
   "Finds the behaviors and errors of the individual."
   [argmap individual]
   (let [program (push-from-plushy (:plushy individual))
-        inputs (doall (map #(float %) (range -10 11)))
-        correct-outputs (map target-function inputs)
+        inputs ()
+        correct-outputs (get-target data-addr)
         outputs (map (fn [input]
                        (peek-stack
                         (interpret-program 
                           program
                           (assoc empty-push-state :input {:in1 input})
                           (:step-limit argmap))
-                        :integer))
+                        :float))
                      inputs)
         errors (map (fn [correct-output output]
                       (if (= output :no-stack-item)
