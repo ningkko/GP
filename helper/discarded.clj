@@ -129,11 +129,39 @@
 
 ;; @@
 (map #(float %) (range -10 11))
+
 ;; @@
 ;; =>
 ;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-unkown'>-10.0</span>","value":"-10.0"},{"type":"html","content":"<span class='clj-unkown'>-9.0</span>","value":"-9.0"},{"type":"html","content":"<span class='clj-unkown'>-8.0</span>","value":"-8.0"},{"type":"html","content":"<span class='clj-unkown'>-7.0</span>","value":"-7.0"},{"type":"html","content":"<span class='clj-unkown'>-6.0</span>","value":"-6.0"},{"type":"html","content":"<span class='clj-unkown'>-5.0</span>","value":"-5.0"},{"type":"html","content":"<span class='clj-unkown'>-4.0</span>","value":"-4.0"},{"type":"html","content":"<span class='clj-unkown'>-3.0</span>","value":"-3.0"},{"type":"html","content":"<span class='clj-unkown'>-2.0</span>","value":"-2.0"},{"type":"html","content":"<span class='clj-unkown'>-1.0</span>","value":"-1.0"},{"type":"html","content":"<span class='clj-unkown'>0.0</span>","value":"0.0"},{"type":"html","content":"<span class='clj-unkown'>1.0</span>","value":"1.0"},{"type":"html","content":"<span class='clj-unkown'>2.0</span>","value":"2.0"},{"type":"html","content":"<span class='clj-unkown'>3.0</span>","value":"3.0"},{"type":"html","content":"<span class='clj-unkown'>4.0</span>","value":"4.0"},{"type":"html","content":"<span class='clj-unkown'>5.0</span>","value":"5.0"},{"type":"html","content":"<span class='clj-unkown'>6.0</span>","value":"6.0"},{"type":"html","content":"<span class='clj-unkown'>7.0</span>","value":"7.0"},{"type":"html","content":"<span class='clj-unkown'>8.0</span>","value":"8.0"},{"type":"html","content":"<span class='clj-unkown'>9.0</span>","value":"9.0"},{"type":"html","content":"<span class='clj-unkown'>10.0</span>","value":"10.0"}],"value":"(-10.0 -9.0 -8.0 -7.0 -6.0 -5.0 -4.0 -3.0 -2.0 -1.0 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)"}
 ;; <=
 
 ;; @@
+(defn lexicase-selection
+  [pop cases]
+  (loop [survivors pop
+         cases-left cases
+         current-case (first (shuffle cases-left))]
+    (if (or (empty? cases-left)
+            (empty? (rest survivors)))
+      (rand-nth survivors)
+      (loop [individual (first survivors)
+             best-error Float/MAX_VALUE
+             next-best-error (regression-error-function current-case individual)]
+        (if (> best-error next-best-error)
+          (recur individual individual)
+          best-error next-best-error
+          next-best-error (regression-error-function current-case individual)
+          (recur individual (first (rest survivors))
+                 best-error best-error
+                 next-best-error (regression-error-function current-case individual)))))
+    (recur survivors 
+           cases-left (filter #(not (= current-case %)) cases-left)
+           current-case (first (shuffle case-lefft)))))
+          
+
+)))
+;; first (shuffle (filter #(not (= current-case %)) cases-left))))
+
+
 
 ;; @@
