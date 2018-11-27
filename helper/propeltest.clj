@@ -6,8 +6,9 @@
   2. set output
   3. lexicase selection cases)
 
-(ns ast-test
-  (:require [gorilla-plot.core :as plot]
+(ns propeltest
+  (:gen-class
+   :require [gorilla-plot.core :as plot]
    			[clojure-csv.core :refer :all]))
 
 ;; @@
@@ -24,9 +25,6 @@
 ;; <=
 
 ;; @@
-(ns propeltest
-  (:gen-class))
-
 
 (def data-addr "src/training_set_metadata.csv")
 
@@ -35,7 +33,6 @@
   {:exec '()
    :float '(1.0 2.0 3.0 4.0 5.0 6.0 7.0)
    :input {:in1 4}})
-
 
 
 ; Instructions must all be either functions that take one Push state and return another
@@ -59,7 +56,6 @@
     'e
     'boolean_negative
     'boolean_positive
-    ;;'float_floatify
     'float_absolute
     'float_sqrt
     'float_cbrt
@@ -88,16 +84,19 @@
       (doall
         (map #(nth % column-index) data)))))
 
+
 (defn read-row 
   [filename row-index]
   (with-open [reader (io/reader filename)]
       (nth (csv/read-csv reader) row-index)))
+
 
 (defn get-target-list
   [file-name]
   (doall
     (map #(float (read-string %))
          (rest (read-column file-name 11)))))
+
 
 (defn get-single-target
   [file-name target-column]
@@ -111,14 +110,6 @@
    :string '()
    :boolean '()
    :input {}})
-
-
-(defn abs
-  "Absolute value."
-  [x]
-  (if (neg? x)
-    (- x)
-    x))
 
 
 (defn not-lazy
