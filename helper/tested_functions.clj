@@ -12,7 +12,7 @@
 ;; **
 
 ;; @@
-(ns ast-test
+(ns tested-functions
   (:require [gorilla-plot.core :as plot]
    			[propel.core :refer :all]
    			[clojure-csv.core :refer :all]))
@@ -28,7 +28,7 @@
 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast-test/plushy-b</span>","value":"#'ast-test/plushy-b"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;tested-functions/plushy-b</span>","value":"#'tested-functions/plushy-b"}
 ;; <=
 
 ;; @@
@@ -43,7 +43,7 @@
   
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast-test/b</span>","value":"#'ast-test/b"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;tested-functions/b</span>","value":"#'tested-functions/b"}
 ;; <=
 
 ;; @@
@@ -88,36 +88,36 @@
 )
 ;; @@
 ;; ->
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
-;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
 ;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
+;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
 ;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
-;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
+;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
 ;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
 ;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_*) (:string_* :string_% :test1 :Integer_* :Integer_% :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :Ineger_+) (:string_* :Integer_*) (:string_+ :Ineger_+) (:string_* :Integer_*) (:test1 :test2))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
+;;; ((:string_+ :string_- :Ineger_+ :Integer_-) (:string_+ :string_- :Ineger_+ :Integer_-) (:test1 :test2 :test2 :test1))
+;;; ((:string_+ :string_- :string_* :string_% :string_+ :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+))
 ;;; 
 ;; <-
 ;; =>
@@ -155,7 +155,7 @@
                index)))) 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast-test/multi-point-crossover-parallel-interleaving</span>","value":"#'ast-test/multi-point-crossover-parallel-interleaving"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;tested-functions/multi-point-crossover-parallel-interleaving</span>","value":"#'tested-functions/multi-point-crossover-parallel-interleaving"}
 ;; <=
 
 ;; @@
@@ -165,35 +165,35 @@
 ;; @@
 ;; ->
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
-;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
-;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
 ;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
 ;;; 
 ;; <-
 ;; =>
@@ -228,7 +228,7 @@
                index)))) 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast-test/multi-point-crossover-parallel-even</span>","value":"#'ast-test/multi-point-crossover-parallel-even"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;tested-functions/multi-point-crossover-parallel-even</span>","value":"#'tested-functions/multi-point-crossover-parallel-even"}
 ;; <=
 
 ;; @@
@@ -237,35 +237,35 @@
 )
 ;; @@
 ;; ->
-;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
-;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
-;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
-;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
 ;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
 ;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
 ;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
 ;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
 ;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
 ;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
 ;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
 ;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
 ;;; 
 ;; <-
@@ -282,19 +282,19 @@
   "see definition above. Mutation rate [0 1)"
   [plushy mutation-rate]
   (map #(if (<= (rand) mutation-rate)
-             (vector (rand-nth instructions))
+             (vector (rand-nth default-instructions))
              %) 
           plushy))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast-test/bit-mutation</span>","value":"#'ast-test/bit-mutation"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;tested-functions/bit-mutation</span>","value":"#'tested-functions/bit-mutation"}
 ;; <=
 
 ;; @@
 (bit-mutation (concat plushy-a plushy-b) 0.6)
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>string_includes?</span>","value":"string_includes?"}],"value":"[string_includes?]"},{"type":"html","content":"<span class='clj-keyword'>:string_-</span>","value":":string_-"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>boolean_is-negative</span>","value":"boolean_is-negative"}],"value":"[boolean_is-negative]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>string_length</span>","value":"string_length"}],"value":"[string_length]"},{"type":"html","content":"<span class='clj-keyword'>:string_+</span>","value":":string_+"},{"type":"html","content":"<span class='clj-keyword'>:string_-</span>","value":":string_-"},{"type":"html","content":"<span class='clj-keyword'>:string_*</span>","value":":string_*"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>1</span>","value":"1"}],"value":"[1]"},{"type":"html","content":"<span class='clj-keyword'>:test1</span>","value":":test1"},{"type":"html","content":"<span class='clj-keyword'>:test2</span>","value":":test2"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>exec_dup</span>","value":"exec_dup"}],"value":"[exec_dup]"},{"type":"html","content":"<span class='clj-keyword'>:Integer_-</span>","value":":Integer_-"},{"type":"html","content":"<span class='clj-keyword'>:Integer_*</span>","value":":Integer_*"},{"type":"html","content":"<span class='clj-keyword'>:Integer_%</span>","value":":Integer_%"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>string_take</span>","value":"string_take"}],"value":"[string_take]"},{"type":"html","content":"<span class='clj-keyword'>:Integer_-</span>","value":":Integer_-"},{"type":"html","content":"<span class='clj-keyword'>:Integer_*</span>","value":":Integer_*"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>integer_+</span>","value":"integer_+"}],"value":"[integer_+]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>1</span>","value":"1"}],"value":"[1]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>integer_%</span>","value":"integer_%"}],"value":"[integer_%]"}],"value":"([string_includes?] :string_- [boolean_is-negative] [string_length] :string_+ :string_- :string_* [1] :test1 :test2 [exec_dup] :Integer_- :Integer_* :Integer_% [string_take] :Integer_- :Integer_* [integer_+] [1] [integer_%])"}
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>boolean_not</span>","value":"boolean_not"}],"value":"[boolean_not]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>exec_if</span>","value":"exec_if"}],"value":"[exec_if]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-string'>&quot;T&quot;</span>","value":"\"T\""}],"value":"[\"T\"]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>integer_+</span>","value":"integer_+"}],"value":"[integer_+]"},{"type":"html","content":"<span class='clj-keyword'>:string_+</span>","value":":string_+"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>string_drop</span>","value":"string_drop"}],"value":"[string_drop]"},{"type":"html","content":"<span class='clj-keyword'>:string_*</span>","value":":string_*"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-string'>&quot;G&quot;</span>","value":"\"G\""}],"value":"[\"G\"]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-long'>1</span>","value":"1"}],"value":"[1]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-unkown'>false</span>","value":"false"}],"value":"[false]"},{"type":"html","content":"<span class='clj-keyword'>:Ineger_+</span>","value":":Ineger_+"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>boolean_or</span>","value":"boolean_or"}],"value":"[boolean_or]"},{"type":"html","content":"<span class='clj-keyword'>:Integer_*</span>","value":":Integer_*"},{"type":"html","content":"<span class='clj-keyword'>:Integer_%</span>","value":":Integer_%"},{"type":"html","content":"<span class='clj-keyword'>:Ineger_+</span>","value":":Ineger_+"},{"type":"html","content":"<span class='clj-keyword'>:Integer_-</span>","value":":Integer_-"},{"type":"html","content":"<span class='clj-keyword'>:Integer_*</span>","value":":Integer_*"},{"type":"html","content":"<span class='clj-keyword'>:Integer_%</span>","value":":Integer_%"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-unkown'>false</span>","value":"false"}],"value":"[false]"},{"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-symbol'>exec_if</span>","value":"exec_if"}],"value":"[exec_if]"}],"value":"([boolean_not] [exec_if] [\"T\"] [integer_+] :string_+ [string_drop] :string_* [\"G\"] [1] [false] :Ineger_+ [boolean_or] :Integer_* :Integer_% :Ineger_+ :Integer_- :Integer_* :Integer_% [false] [exec_if])"}
 ;; <=
 
 ;; @@
@@ -334,7 +334,7 @@
 
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-keyword'>:string_+</span>","value":":string_+"},{"type":"html","content":"<span class='clj-keyword'>:string_-</span>","value":":string_-"},{"type":"html","content":"<span class='clj-keyword'>:Integer_*</span>","value":":Integer_*"},{"type":"html","content":"<span class='clj-keyword'>:Integer_%</span>","value":":Integer_%"},{"type":"html","content":"<span class='clj-keyword'>:string_+</span>","value":":string_+"},{"type":"html","content":"<span class='clj-keyword'>:string_-</span>","value":":string_-"},{"type":"html","content":"<span class='clj-keyword'>:Integer_*</span>","value":":Integer_*"},{"type":"html","content":"<span class='clj-keyword'>:Integer_%</span>","value":":Integer_%"},{"type":"html","content":"<span class='clj-keyword'>:test1</span>","value":":test1"},{"type":"html","content":"<span class='clj-keyword'>:test2</span>","value":":test2"}],"value":"(:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;tested-functions/crossover-test</span>","value":"#'tested-functions/crossover-test"}
 ;; <=
 
 ;; @@
@@ -342,36 +342,36 @@
   (println (crossover-test plushy-a plushy-b)))
 ;; @@
 ;; ->
-;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :string_- :string_* :string_% :test1 :test2)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
 ;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
 ;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:Ineger_+ :Integer_- :string_* :string_% :Ineger_+ :Integer_- :string_* :string_% :test2 :test1)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :string_- :string_* :string_% :test1 :test2)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :string_- :string_* :string_% :test1 :test2)
 ;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
 ;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
 ;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
-;;; (:Ineger_+ :Integer_- :Integer_* :string_% :string_+ :string_- :Integer_* :Integer_% :test2 :test2)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
 ;;; (:Ineger_+ :Integer_- :string_* :string_% :Ineger_+ :Integer_- :string_* :string_% :test2 :test1)
 ;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
-;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
-;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :string_- :string_* :string_% :test1 :test2)
-;;; (:Ineger_+ :Integer_- :string_* :string_% :Ineger_+ :Integer_- :string_* :string_% :test2 :test1)
-;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :string_- :string_* :string_% :test1 :test2)
-;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
-;;; (:string_+ :string_- :string_* :string_% :string_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
 ;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
 ;;; (:string_+ :string_- :Integer_* :Integer_% :string_+ :string_- :Integer_* :Integer_% :test1 :test2)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
+;;; (:Ineger_+ :Integer_- :string_* :string_% :Ineger_+ :Integer_- :string_* :string_% :test2 :test1)
+;;; (:string_+ :string_- :string_* :Integer_% :Ineger_+ :Integer_- :string_* :string_% :test1 :test1)
+;;; (:Ineger_+ :Integer_- :string_* :string_% :Ineger_+ :Integer_- :string_* :string_% :test2 :test1)
+;;; (:string_+ :Integer_- :string_* :Integer_% :string_+ :Integer_- :string_* :Integer_% :test1 :test1)
+;;; (:Ineger_+ :string_- :Integer_* :string_% :Ineger_+ :string_- :Integer_* :string_% :test2 :test2)
+;;; (:Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :string_- :string_* :string_% :test1 :test2)
 ;;; 
 ;; <-
 ;; =>
@@ -413,7 +413,7 @@
 
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast-test/multi-point-crossover-parallel</span>","value":"#'ast-test/multi-point-crossover-parallel"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;tested-functions/multi-point-crossover-parallel</span>","value":"#'tested-functions/multi-point-crossover-parallel"}
 ;; <=
 
 ;; @@
@@ -422,28 +422,45 @@
   (multi-point-crossover-parallel plushy-a plushy-b))
 ;; @@
 ;; ->
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_+ :string_- :Ineger_+ :Integer_- :string_+ :string_- :Ineger_+ :Integer_- :test1 :test2 :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
-;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
-;;; (:string_+ :string_- :Ineger_+ :Integer_- :string_+ :string_- :Ineger_+ :Integer_- :test1 :test2 :test2 :test1)
-;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
-;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
-;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
-;;; (:string_+ :string_- :string_* :string_% :string_+ :string_- :string_* :string_% :test1 :test2 :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
-;;; (:string_* :string_% :Integer_* :Integer_% :string_* :string_% :Integer_* :Integer_%)
 ;;; (:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_* :string_* :string_% :test1 :Integer_* :Integer_% :test2)
+;;; ()
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_+ :string_- :Ineger_+ :Integer_- :string_+ :string_- :Ineger_+ :Integer_- :test1 :test2 :test2 :test1)
+;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
+;;; (:string_+ :string_- :string_* :string_% :string_+ :string_- :string_* :string_% :test1 :test2 :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
 ;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
+;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
+;;; (:string_+ :string_- :string_* :string_% :string_+ :string_- :string_* :string_% :test1 :test2 :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_* :string_* :string_% :test1 :Integer_* :Integer_% :test2)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
 ;;; (:string_% :string_+ :string_- :Integer_% :Ineger_+ :Integer_- :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :string_* :string_% :test1 :test2 :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :string_- :string_* :string_% :string_+ :string_- :string_* :string_% :test1 :test2 :Ineger_+ :Integer_- :Integer_* :Integer_% :Ineger_+ :Integer_- :Integer_* :Integer_% :test2 :test1)
+;;; (:string_+ :Ineger_+ :string_* :Integer_* :string_+ :Ineger_+ :string_* :Integer_* :test1 :test2)
+;;; (:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_* :string_* :string_% :test1 :Integer_* :Integer_% :test2)
+;;; (:string_+ :string_- :string_* :Ineger_+ :Integer_- :Integer_* :string_* :string_% :test1 :Integer_* :Integer_% :test2)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; (:string_- :Integer_- :string_% :Integer_% :string_- :Integer_- :string_% :Integer_% :test2 :test1)
+;;; ()
 ;;; 
 ;; <-
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
+
+;; @@
+
+;; @@
 
 ;; @@
 

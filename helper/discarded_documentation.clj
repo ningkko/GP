@@ -6,7 +6,7 @@
 ;; **
 
 ;; @@
-(ns discarded
+(ns discarded_documentation
   (:require [gorilla-plot.core :as plot]
    			[propel.core :refer :all]
    			[clojure-csv.core :refer :all]))
@@ -136,7 +136,8 @@
 ;; <=
 
 ;; @@
-(defn lexicase-selection
+(comment
+  (defn lexicase-selection
   [pop cases]
   (loop [survivors pop
          cases-left cases
@@ -159,9 +160,16 @@
            current-case (first (shuffle case-lefft)))))
           
 
-)))
+)
 ;; first (shuffle (filter #(not (= current-case %)) cases-left))))
 
 
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
 
 ;; @@
