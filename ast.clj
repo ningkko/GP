@@ -386,16 +386,6 @@
     (apply min-key :total-error tournament-set)))
 
 
-
-- (defn tournament-selection
-  "Selects an individual from the population using a tournament."
-  [pop argmap]
-  (let [tournament-size (:tournament-size argmap)
-        tournament-set (take tournament-size (shuffle pop))]
-    (apply min-key :total-error tournament-set)))
-
-
-
 (defn lexicase-selection
   "Selects an individual from the population using lexicase selection."
   [pop argmap]
@@ -505,7 +495,7 @@
 
 (defn bit-mutation
   "see definition above. Mutation rate [0 1)"
-  [plushy mutation-rate]
+  [plushy mutation-rate instructions]
   (map #(if (<= (rand) mutation-rate)
              (vector (rand-nth instructions))
              %) 
