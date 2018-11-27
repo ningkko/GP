@@ -5,6 +5,19 @@
   1. set input
   2. set output
   3. lexicase selection cases)
+
+(ns ast-test
+  (:require [gorilla-plot.core :as plot]
+   			[clojure-csv.core :refer :all]))
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+(require '[clojure.data.csv :as csv]
+         '[clojure.java.io :as io])
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
@@ -15,9 +28,7 @@
   (:gen-class))
 
 
-
 (def data-addr "src/training_set_metadata.csv")
-
 
 
 (def example-push-state
@@ -30,7 +41,7 @@
 ; Instructions must all be either functions that take one Push state and return another
 ; or constant literals.
 ; TMH: ERCs?
-(def instructions
+(def default-instructions
   (list
     'in1
     'exec_dup
@@ -70,11 +81,28 @@
 ;;;;;;;;;
 ;; Utilities
 
-(defn get-target
+(defn read-column 
+  [filename column-index]
+  (with-open [reader (io/reader filename)]
+    (let [data (csv/read-csv reader)]
+      (doall
+        (map #(nth % column-index) data)))))
+
+(defn read-row 
+  [filename row-index]
+  (with-open [reader (io/reader filename)]
+      (nth (csv/read-csv reader) row-index)))
+
+(defn get-target-list
   [file-name]
   (doall
     (map #(float (read-string %))
          (rest (read-column file-name 11)))))
+
+(defn get-single-target
+  [file-name target-column]
+  (rest 
+    (apply vector (read-column file-name target-column))))
 
 
 (def empty-push-state
@@ -351,35 +379,51 @@
   (repeatedly (rand-int max-initial-plushy-size)
               #(rand-nth instructions)))
 
+
 (defn tournament-selection
-  "Selects an individual for variation using a tournament."
-  [pop]
-  (let [tournament-size 5
+  "Selects an individual from the population using a tournament."
+  [pop argmap]
+  (let [tournament-size (:tournament-size argmap)
         tournament-set (take tournament-size (shuffle pop))]
     (apply min-key :total-error tournament-set)))
 
 
-;;================================ lexicase test ==========================================
+
+- (defn tournament-selection
+  "Selects an individual from the population using a tournament."
+  [pop argmap]
+  (let [tournament-size (:tournament-size argmap)
+        tournament-set (take tournament-size (shuffle pop))]
+    (apply min-key :total-error tournament-set)))
+
 
 
 (defn lexicase-selection
-  [pop]
+  "Selects an individual from the population using lexicase selection."
+  [pop argmap]
   (loop [survivors pop
          cases (shuffle (range (count (:errors (first pop)))))]
     (if (or (empty? cases)
             (empty? (rest survivors)))
       (rand-nth survivors)
       (let [min-err-for-case (apply min (map #(nth % (first cases))
-                                             (map #(:errors %) survivors)))]
+                                             (map :errors survivors)))]
         (recur (filter #(= (nth (:errors %) (first cases)) min-err-for-case)
                        survivors)
                (rest cases))))))
 
 
 
-;;==========================================================================================
+(defn select-parent
+  "Selects a parent from the population using the specified method."
+  [pop argmap]
+  (case (:parent-selection argmap)
+    :tournament (tournament-selection pop argmap)
+    :lexicase (lexicase-selection pop argmap)))
 
-(defn crossover
+
+
+(defn uniform-crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
@@ -395,13 +439,87 @@
 
 
 
+(defn multipoint-crossover
+  "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
+  take odd genomes, uniform sized
+  a-1+b-2+a-3+b-4+...+a_left+b_left"
+  
+  [plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a)
+        length (count longer) ;;length of genes
+        ;;at least 2 chunks'
+        chunk-number (+ 2 (rand-int (dec length)))
+        chunk-size (int (/ length chunk-number))
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))
+        segmented-a (map vec (partition-all chunk-size plushy-a))
+        segmented-b (map vec (partition-all chunk-size plushy-b))]  
+    
+    (loop [use-a (rand-nth [true false])
+           a segmented-a
+           b segmented-b
+           result []]
+        
+      (if (empty? a)
+        (remove #(= % :crossover-padding) result)
+        (recur (not use-a)
+               (rest a)
+               (rest b)
+               (concat result (if use-a
+                              (first a) 
+                              (first b)))))))) 
+
+
+
+(defn multipoint-crossover-parallel
+  "a1-b1-a3-b3-... or a-2-b2-a4-b4-..."
+  [plushy-a plushy-b]
+  (let [shorter (min-key count plushy-a plushy-b)
+        longer (if (= shorter plushy-a)
+                   plushy-b
+                   plushy-a)
+        length (count longer) ;;length of genes
+        chunk-number (+ 1 (rand-int length))
+        chunk-size (int (/ length chunk-number))
+        length-diff (- (count longer) (count shorter))
+        shorter-padded (concat shorter (repeat length-diff :crossover-padding))
+        segmented-a (map vec (partition-all chunk-size plushy-a))
+        segmented-b (map vec (partition-all chunk-size plushy-b))]
+    
+    (loop [start-at-0th (rand-nth [true false])
+           a (if start-at-0th
+               segmented-a
+               (rest segmented-a))
+           b (if start-at-0th
+               segmented-b
+               (rest segmented-b))
+           result []]
+        
+      (if (empty? a)
+        (remove #(= % :crossover-padding) result)
+        (recur start-at-0th
+               (rest (rest a))
+               (rest (rest b))
+               (concat result (first a) (first b))))))) 
+
+(defn bit-mutation
+  "see definition above. Mutation rate [0 1)"
+  [plushy mutation-rate]
+  (map #(if (<= (rand) mutation-rate)
+             (vector (rand-nth instructions))
+             %) 
+          plushy))
+
 (defn uniform-addition
   "Randomly adds new instructions before every instruction (and at the end of
   the plushy) with some probability."
-  [plushy]
+  [plushy instructions mutation-rate]
   (let [rand-code (repeatedly (inc (count plushy))
                               (fn []
-                                (if (< (rand) 0.05)
+                                (if (< (rand) mutation-rate)
                                   (rand-nth instructions)
                                   :mutation-padding)))]
     (remove #(= % :mutation-padding)
@@ -410,21 +528,47 @@
 
 (defn uniform-deletion
   "Randomly deletes instructions from plushy at some rate."
-  [plushy]
-  (remove (fn [x] (< (rand) 0.05))
+  [plushy mutation-rate]
+  (remove (fn [x] (< (rand) mutation-rate))
           plushy))
 
-;;---------------------------test------------------------------------------------------------
-(defn select-and-vary
-  "Selects parent(s) from population and varies them."
-  [pop]
+(defn new-individual
+  "Returns a new individual produced by selection and variation of
+  individuals in the population."
+  [pop argmap]
   {:plushy
    (let [prob (rand)]
      (cond
-       (< prob 0.5) (crossover (:plushy (lexicase-selection pop))
-                               (:plushy (lexicase-selection pop)))
-       (< prob 0.75) (uniform-addition (:plushy (lexicase-selection pop)))
-       :else (uniform-deletion (:plushy (lexicase-selection pop)))))})
+       (< prob 0.5) (crossover (:plushy (select-parent pop argmap))
+                               (:plushy (select-parent pop argmap)))
+       (< prob 0.75) (uniform-addition (:plushy (select-parent pop argmap))
+                                       (:instructions argmap)
+                                       (:mutation-rate argmap))
+       :else (uniform-deletion (:plushy (select-parent pop argmap))
+                               (:mutation-rate argmap))))})
+
+(defn uniform-deletion
+  "Randomly deletes instructions from plushy at some rate."
+  [plushy mutation-rate]
+  (remove (fn [x] (< (rand) mutation-rate))
+          plushy))
+
+(defn new-individual
+  "Returns a new individual produced by selection and variation of
+  individuals in the population."
+  [pop argmap]
+  {:plushy
+   (let [prob (rand)]
+     (cond
+       (< prob 0.5) (crossover (:plushy (select-parent pop argmap))
+                               (:plushy (select-parent pop argmap)))
+       (< prob 0.75) (uniform-addition (:plushy (select-parent pop argmap))
+                                       (:instructions argmap)
+                                       (:mutation-rate argmap))
+       :else (uniform-deletion (:plushy (select-parent pop argmap))
+                               (:mutation-rate argmap))))})
+
+
 
 ;;------------------------------------------------------------------------------------------
 (defn report
@@ -493,22 +637,24 @@
            :total-error (apply +' errors))))
 
 
+
 (defn -main
   "Runs propel-gp, giving it a map of arguments."
   [& args]
-  (binding [*ns* (the-ns 'propeltest)]
-    (propel-gp (update-in (merge {:instructions instructions
+  (binding [*ns* (the-ns 'propel.core)]
+    (propel-gp (update-in (merge {:instructions default-instructions
                                   :error-function regression-error-function
-                                  :max-generations 100
+                                  :max-generations 500
                                   :population-size 200
                                   :max-initial-plushy-size 50
-                                  :step-limit 100}
+                                  :step-limit 100
+                                  :parent-selection :tournament
+                                  :tournament-size 5
+                                  :mutation-rate 0.1}
                                  (apply hash-map
                                         (map read-string args)))
                           [:error-function]
                           #(if (fn? %) % (eval %))))))
-
-
 
 
 ;; @@
@@ -518,10 +664,6 @@
 
 ;; @@
 ;;(-main)
-;; @@
-
-;; @@
-
 ;; @@
 
 ;; @@
