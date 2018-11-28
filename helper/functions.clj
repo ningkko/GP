@@ -37,6 +37,13 @@
 ;; <=
 
 ;; @@
+(def filename "src/training_set_metadata.csv")
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;functions/filename</span>","value":"#'functions/filename"}
+;; <=
+
+;; @@
 (defn read-file
   [filename]
   (doall
@@ -65,22 +72,34 @@
 ;; <=
 
 ;; @@
-(read-row filename 1)
+;;(def input (rest (map #(drop-last (read-row filename %)) (range (count (read-column filename 0))))))
+(defn to-float 
+  [input]
+  (let [evaluated-input (read-string input)]
+    (if (= clojure.lang.Symbol (type evaluated-input))
+      (float 0.0)
+      (float evaluated-input))))
+
+(map to-float (drop-last (read-row filename 1)))
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-string'>&quot;615&quot;</span>","value":"\"615\""},{"type":"html","content":"<span class='clj-string'>&quot;349.046051&quot;</span>","value":"\"349.046051\""},{"type":"html","content":"<span class='clj-string'>&quot;-61.943836&quot;</span>","value":"\"-61.943836\""},{"type":"html","content":"<span class='clj-string'>&quot;320.796530&quot;</span>","value":"\"320.796530\""},{"type":"html","content":"<span class='clj-string'>&quot;-51.753706&quot;</span>","value":"\"-51.753706\""},{"type":"html","content":"<span class='clj-string'>&quot;1&quot;</span>","value":"\"1\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;0.0000&quot;</span>","value":"\"0.0000\""},{"type":"html","content":"<span class='clj-string'>&quot;nan&quot;</span>","value":"\"nan\""},{"type":"html","content":"<span class='clj-string'>&quot;0.017&quot;</span>","value":"\"0.017\""},{"type":"html","content":"<span class='clj-string'>&quot;92&quot;</span>","value":"\"92\""}],"value":"[\"615\" \"349.046051\" \"-61.943836\" \"320.796530\" \"-51.753706\" \"1\" \"0.0000\" \"0.0000\" \"0.0000\" \"nan\" \"0.017\" \"92\"]"}
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-unkown'>615.0</span>","value":"615.0"},{"type":"html","content":"<span class='clj-unkown'>349.04605</span>","value":"349.04605"},{"type":"html","content":"<span class='clj-unkown'>-61.943836</span>","value":"-61.943836"},{"type":"html","content":"<span class='clj-unkown'>320.79654</span>","value":"320.79654"},{"type":"html","content":"<span class='clj-unkown'>-51.753708</span>","value":"-51.753708"},{"type":"html","content":"<span class='clj-unkown'>1.0</span>","value":"1.0"},{"type":"html","content":"<span class='clj-unkown'>0.0</span>","value":"0.0"},{"type":"html","content":"<span class='clj-unkown'>0.0</span>","value":"0.0"},{"type":"html","content":"<span class='clj-unkown'>0.0</span>","value":"0.0"},{"type":"html","content":"<span class='clj-unkown'>0.0</span>","value":"0.0"},{"type":"html","content":"<span class='clj-unkown'>0.017</span>","value":"0.017"}],"value":"(615.0 349.04605 -61.943836 320.79654 -51.753708 1.0 0.0 0.0 0.0 0.0 0.017)"}
 ;; <=
 
 ;; @@
-(def filename "src/training_set_metadata.csv")
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;functions/filename</span>","value":"#'functions/filename"}
-;; <=
+
+(defn get-input
+  []
+  (rest 
+   (map #(map to-float (drop-last (read-row filename %))) 
+        (range 10))))
+
+(def input (get-input))
 
 ;; @@
-(read-file filename)
-;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.LazySeq</span>","value":"clojure.lang.LazySeq"}
+;; <=
 
 ;; @@
 ;;( type 

@@ -7,8 +7,8 @@
   3. lexicase selection cases)
 
 (ns ast
-  (:gen-class
-   :require [gorilla-plot.core :as plot]
+  (:gen-class)
+  (:require [gorilla-plot.core :as plot]
    			[clojure-csv.core :refer :all]))
 
 ;; @@
@@ -410,6 +410,13 @@
     :lexicase (lexicase-selection pop argmap)))
 
 
+(defn crossover
+  [plushy-a plushy-b argmap]
+  (case (:crossover argmap)
+    :uniform (uniform-crossover plushy-a plushy-b)
+    :multipoint (multipoint-crossover plushy-a plushy-b)
+    :multi-parallel (multipoint-crossover-parallel plushy-a plushy-b)))
+
 
 (defn uniform-crossover
   "Crosses over two individuals using uniform crossover. Pads shorter one."
@@ -527,28 +534,7 @@
   {:plushy
    (let [prob (rand)]
      (cond
-       (< prob 0.5) (uniform-crossover (:plushy (select-parent pop argmap))
-                               (:plushy (select-parent pop argmap)))
-       (< prob 0.75) (uniform-addition (:plushy (select-parent pop argmap))
-                                       (:instructions argmap)
-                                       (:mutation-rate argmap))
-       :else (uniform-deletion (:plushy (select-parent pop argmap))
-                               (:mutation-rate argmap))))})
-
-(defn uniform-deletion
-  "Randomly deletes instructions from plushy at some rate."
-  [plushy mutation-rate]
-  (remove (fn [x] (< (rand) mutation-rate))
-          plushy))
-
-(defn new-individual
-  "Returns a new individual produced by selection and variation of
-  individuals in the population."
-  [pop argmap]
-  {:plushy
-   (let [prob (rand)]
-     (cond
-       (< prob 0.5) (uniform-crossover (:plushy (select-parent pop argmap))
+       (< prob 0.5) (crossover (:plushy (select-parent pop argmap))
                                (:plushy (select-parent pop argmap)))
        (< prob 0.75) (uniform-addition (:plushy (select-parent pop argmap))
                                        (:instructions argmap)
