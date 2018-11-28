@@ -28,13 +28,69 @@
 
 (def data-addr "src/training_set_metadata.csv")
 
+;;;;;;;;;
+;; input and target
 
-(def example-push-state
-  {:exec '()
-   :float '(1.0 2.0 3.0 4.0 5.0 6.0 7.0)
-   :input {:in1 4}})
+(defn read-column 
+  [filename column-index]
+  (with-open [reader (io/reader filename)]
+    (let [data (csv/read-csv reader)]
+      (doall
+        (map #(nth % column-index) data)))))
 
 
+(defn read-row 
+  [filename row-index]
+  (with-open [reader (io/reader filename)]
+      (nth (csv/read-csv reader) row-index)))
+
+(defn to-float 
+  [input]
+  (let [evaluated-input (read-string input)]
+    (if (= clojure.lang.Symbol (type evaluated-input))
+      (float 0.0)
+      (float evaluated-input))))
+
+(defn get-input
+  [filename]
+  (rest (map #(map to-float (drop-last (read-row filename %))) 
+             (range (count (read-column filename 0))))))
+
+
+(defn get-target
+  [file-name]
+  (doall
+    (map #(float (read-string %))
+         (rest (read-column file-name 11)))))
+
+
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/get-target-list</span>","value":"#'ast/get-target-list"}
+;; <=
+
+;; @@
+
+(def input (get-input data-addr))
+
+(def target (get-target data-addr))
+
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/target</span>","value":"#'ast/target"}
+;; <=
+
+;; @@
+input
+;; @@
+
+;; @@
+target
+;; @@
+
+;; @@
 ; Instructions must all be either functions that take one Push state and return another
 ; or constant literals.
 ; TMH: ERCs?
@@ -67,41 +123,22 @@
    ))
 
 
+(def example-push-state
+  {:exec '()
+   :float '(1.0 2.0 3.0 4.0 5.0 6.0 7.0)
+   :input {:in1 4}})
+
 
 (def opens ; number of blocks opened by instructions (default = 0)
   {'exec_dup 1 
    'exec_if 2})
 
 
+;; @@
 
+;; @@
 ;;;;;;;;;
 ;; Utilities
-
-(defn read-column 
-  [filename column-index]
-  (with-open [reader (io/reader filename)]
-    (let [data (csv/read-csv reader)]
-      (doall
-        (map #(nth % column-index) data)))))
-
-
-(defn read-row 
-  [filename row-index]
-  (with-open [reader (io/reader filename)]
-      (nth (csv/read-csv reader) row-index)))
-
-
-(defn get-target-list
-  [file-name]
-  (doall
-    (map #(float (read-string %))
-         (rest (read-column file-name 11)))))
-
-
-(defn get-single-target
-  [file-name target-column]
-  (rest 
-    (apply vector (read-column file-name target-column))))
 
 
 (def empty-push-state
@@ -184,6 +221,10 @@
       (let [result (apply function (:args args-pop-result))
             new-state (:state args-pop-result)]
         (push-to-stack new-state return-stack result)))))
+
+;; @@
+
+;; @@
 
 
 ;;;;;;;;;
@@ -303,7 +344,12 @@
 
 
 
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.Symbol</span>","value":"clojure.lang.Symbol"}
+;; <=
 
+;; @@
 
 ;;;;;;;;;
 ;; Interpreter
@@ -367,6 +413,9 @@
               (recur push (rest plushy))) ;; unmatched close, ignore
             (recur (concat push [i]) (rest plushy)))))))) ;; anything else
 
+;; @@
+
+;; @@
 
 ;;;;;;;;;
 ;; GP
@@ -408,14 +457,6 @@
   (case (:parent-selection argmap)
     :tournament (tournament-selection pop argmap)
     :lexicase (lexicase-selection pop argmap)))
-
-
-(defn crossover
-  [plushy-a plushy-b argmap]
-  (case (:crossover argmap)
-    :uniform (uniform-crossover plushy-a plushy-b)
-    :multipoint (multipoint-crossover plushy-a plushy-b)
-    :multi-parallel (multipoint-crossover-parallel plushy-a plushy-b)))
 
 
 (defn uniform-crossover
@@ -469,7 +510,7 @@
 
 
 
-(defn multipoint-crossover-parallel
+(defn multipoint-parallel
   "a1-b1-a3-b3-... or a-2-b2-a4-b4-..."
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
@@ -499,6 +540,14 @@
                (rest (rest a))
                (rest (rest b))
                (concat result (first a) (first b))))))) 
+
+
+(defn crossover
+  [plushy-a plushy-b argmap]
+  (case (:crossover argmap)
+    :uniform (uniform-crossover plushy-a plushy-b)
+    :multipoint (multipoint-crossover plushy-a plushy-b)
+    :multi-parallel (multipoint-parallel plushy-a plushy-b)))
 
 (defn bit-mutation
   "see definition above. Mutation rate [0 1)"
@@ -544,6 +593,9 @@
 
 
 
+;; @@
+
+;; @@
 ;;------------------------------------------------------------------------------------------
 (defn report
   "Reports information each generation."
@@ -630,23 +682,5 @@
                           [:error-function]
                           #(if (fn? %) % (eval %))))))
 
-
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;ast/-main</span>","value":"#'ast/-main"}
-;; <=
-
-;; @@
-;;(-main)
-;; @@
-
-;; @@
-(type (read-string "nah"))
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.Symbol</span>","value":"clojure.lang.Symbol"}
-;; <=
-
-;; @@
 
 ;; @@
