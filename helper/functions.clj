@@ -1,18 +1,7 @@
 ;; gorilla-repl.fileformat = 1
 
 ;; **
-;;; # ast
-;;; 
-;;; #### TODO
-;;; 1. Readin data (Done)
-;;; 2. Get input data & target data (Done)
-;;; 3. crossover (Testing)
-;;; 4. mutation (if error > C, flip bit?) 
-;;; 5. Error function
-;;; 6. Simple GP
-;;; 7. function to decide which crossover to use overtime
-;;; 8. tournament->lexicase
-;;; 
+;;; # ast functions
 ;;; 
 ;;; 
 ;;; 
@@ -62,6 +51,12 @@
       (doall
         (map #(nth % column-index) data)))))
 
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;functions/read-column</span>","value":"#'functions/read-column"}
+;; <=
+
+;; @@
 (defn read-row 
   [filename row-index]
   (with-open [reader (io/reader filename)]
