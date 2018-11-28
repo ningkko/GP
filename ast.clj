@@ -639,3 +639,14 @@
 ;; @@
 ;;(-main)
 ;; @@
+
+;; @@
+(type (read-string "nah"))
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-class'>clojure.lang.Symbol</span>","value":"clojure.lang.Symbol"}
+;; <=
+
+;; @@
+
+;; @@
