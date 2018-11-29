@@ -122,16 +122,16 @@ target
    
     'pi
     'e
-    'boolean_negative
-    'boolean_positive
+    ;'float_negative
+    ;'float_positive
     ;'float_absolute
-   ; 'float_sqrt
-   ; 'float_cbrt
-    ;'float_+
-  ;  'float_-
-   ; 'float_*
-    ;;'float_%
-  ;  'float_=
+    ;'float_sqrt
+    ;'float_cbrt
+    'float_+
+    'float_-
+    'float_*
+    ;'float_%
+    'float_=
    ))
 
 
@@ -271,6 +271,8 @@ target
   [state]
   (make-push-instruction state
                          (fn [f1 f2]
+                           (if (or (nil? f1)) (nil? f2))
+                           (float 0.0)
                            (if (zero? f2)
                              f1
                              (quot f1 f2)))
@@ -313,7 +315,7 @@ target
   (make-push-instruction state = [:boolean :boolean] :boolean))
 
 
-    
+
 (def pi Math/PI)
 
 (def e Math/E)
@@ -327,11 +329,11 @@ target
 (defn float_absolute
   [state]
   (make-push-instruction state
-                         #(Math/abs %)
+                         #(float(Math/abs %))
                          [:float]
                          :float))
 
-(defn boolean_negative
+(defn float_negative
   [state]
   (make-push-instruction state
                          #(neg? %)
@@ -339,7 +341,7 @@ target
                          :boolean))
 
 
-(defn boolean_positive
+(defn float_positive
   [state]
   (make-push-instruction state
                          #(pos? %)
@@ -349,14 +351,14 @@ target
 (defn float_sqrt
   [state]
   (make-push-instruction state
-                         #(Math/sqrt %)
+                         #(float (Math/sqrt %))
                          [:float]
                          :float))
 
 (defn float_cbrt
   [state]
   (make-push-instruction state
-                         #(Math/cbrt %)
+                         #(float (Math/cbrt %))
                          [:float]
                          [:float]))
 
@@ -437,7 +439,6 @@ target
 ;; <=
 
 ;; @@
-
 ;;;;;;;;;
 ;; GP
 
@@ -500,12 +501,12 @@ target
   "Multi point crossover is a generalization of the one-point crossover wherein alternating segments are swapped to get new off-springs...
   take odd genomes, uniform sized
   a-1+b-2+a-3+b-4+...+a_left+b_left"
-  
+
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (= shorter plushy-a)
-                   plushy-b
-                   plushy-a)
+                 plushy-b
+                 plushy-a)
         length (count longer) ;;length of genes
         ;;at least 2 chunks'
         chunk-number (+ 2 (rand-int (dec length)))
@@ -514,20 +515,20 @@ target
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))
         segmented-a (map vec (partition-all chunk-size plushy-a))
         segmented-b (map vec (partition-all chunk-size plushy-b))]  
-    
+
     (loop [use-a (rand-nth [true false])
            a segmented-a
            b segmented-b
            result []]
-        
+
       (if (empty? a)
         (remove #(= % :crossover-padding) result)
         (recur (not use-a)
                (rest a)
                (rest b)
                (concat result (if use-a
-                              (first a) 
-                              (first b)))))))) 
+                                (first a) 
+                                (first b)))))))) 
 
 
 
@@ -536,8 +537,8 @@ target
   [plushy-a plushy-b]
   (let [shorter (min-key count plushy-a plushy-b)
         longer (if (= shorter plushy-a)
-                   plushy-b
-                   plushy-a)
+                 plushy-b
+                 plushy-a)
         length (count longer) ;;length of genes
         chunk-number (+ 1 (rand-int length))
         chunk-size (int (/ length chunk-number))
@@ -545,7 +546,7 @@ target
         shorter-padded (concat shorter (repeat length-diff :crossover-padding))
         segmented-a (map vec (partition-all chunk-size plushy-a))
         segmented-b (map vec (partition-all chunk-size plushy-b))]
-    
+
     (loop [start-at-0th (rand-nth [true false])
            a (if start-at-0th
                segmented-a
@@ -554,7 +555,7 @@ target
                segmented-b
                (rest segmented-b))
            result []]
-        
+
       (if (empty? a)
         (remove #(= % :crossover-padding) result)
         (recur start-at-0th
@@ -574,9 +575,9 @@ target
   "see definition above. Mutation rate [0 1)"
   [plushy instructions mutation-rate]
   (map #(if (<= (rand) mutation-rate)
-             (vector (rand-nth instructions))
-             %) 
-          plushy))
+          (rand-nth instructions)
+          %) 
+       plushy))
 
 (defn uniform-addition
   "Randomly adds new instructions before every instruction (and at the end of
@@ -604,10 +605,14 @@ target
   {:plushy
    (let [prob (rand)]
      (cond
-       (< prob 0.5) (crossover (:plushy (select-parent pop argmap))
-                               (:plushy (select-parent pop argmap))
-                               argmap)
-                    
+       (< prob 0.5) (let[crossed-plushy (crossover 
+                                         (:plushy (select-parent pop argmap)) 
+                                         (:plushy (select-parent pop argmap))
+                                         argmap)]
+                      (if (:bit-mutation argmap)
+                        (bit-mutation crossed-plushy (:instructions argmap) (:mutation-rate argmap))
+                        crossed-plushy))
+       
        (< prob 0.75) (uniform-addition (:plushy (select-parent pop argmap))
                                        (:instructions argmap)
                                        (:mutation-rate argmap))
@@ -696,15 +701,15 @@ target
   (binding [*ns* (the-ns 'ast)]
     (propel-gp (update-in (merge {:instructions default-instructions
                                   :error-function regression-error-function
-                                  :max-generations 500
+                                  :max-generations 30
                                   :population-size 200
                                   :max-initial-plushy-size 50
                                   :step-limit 100
-                                  :parent-selection :lexicase
+                                  :parent-selection :tournament
                                   :tournament-size 5
-                                  :mutation-rate 0.1
+                                  :mutation-rate 0.05
                                   :crossover :uniform-crossover
-                                  :bit-mutation true}
+                                  :bit-mutation false}
                                  (apply hash-map
                                         (map read-string args)))
                           [:error-function]
@@ -720,90 +725,300 @@ target
 (-main)
 ;; @@
 ;; ->
-;;; Starting GP with args: {:max-initial-plushy-size 50, :bit-mutation true, :crossover :uniform-crossover, :mutation-rate 0.1, :instructions (in1 exec_dup exec_if boolean_and boolean_or boolean_not boolean_= close true false pi e boolean_negative boolean_positive), :max-generations 500, :parent-selection :lexicase, :tournament-size 5, :step-limit 100, :error-function #function[ast/regression-error-function], :population-size 200}
+;;; Starting GP with args: {:max-initial-plushy-size 50, :bit-mutation false, :crossover :uniform-crossover, :mutation-rate 0.05, :instructions (in1 exec_dup exec_if boolean_and boolean_or boolean_not boolean_= close true false pi e float_+ float_- float_* float_=), :max-generations 30, :parent-selection :tournament, :tournament-size 5, :step-limit 100, :error-function #function[ast/regression-error-function], :population-size 200}
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 0
 ;;; -------------------------------------------------------
-;;; Best plushy: (true boolean_negative exec_if false boolean_or false boolean_negative exec_if boolean_= boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_= close boolean_and boolean_= true boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive boolean_= boolean_= boolean_= exec_dup true boolean_positive in1 exec_if boolean_positive)
-;;; Best program: (true boolean_negative exec_if (false boolean_or false boolean_negative exec_if (boolean_= boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_=) (boolean_and boolean_= true boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive boolean_= boolean_= boolean_= exec_dup (true boolean_positive in1 exec_if (boolean_positive) ()))) ())
-;;; Best total error: 707.3146020825952
-;;; Best errors: (91.98299999907613 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.98000000044703 50.272098541259766 1.1524009704589844 48.859901428222656 64.98200000077486 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.98100000061095 15.99100000038743 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (0.017 45.4063 40.2561 40.7951 40.4166 0.02 39.7279 43.1524 41.1401 0.018 39.8317 42.4667 46.7959 42.6207 0.019 0.009 39.2171 38.88 39.7258)
+;;; Best plushy: (in1 false float_+ float_+)
+;;; Best program: (in1 false float_+ (float_+ ()))
+;;; Best total error: 705.8170021073893
+;;; Best errors: (91.98299999907613 42.33150041010231 1.707200299948454 48.045598833821714 49.54180072620511 64.98000000044703 50.22269854135811 1.183400969952345 48.496901432052255 64.98200000077486 50.15090062841773 0.7150015123188496 5.339398453012109 47.08559916168451 64.98100000061095 15.99100000038743 27.75350176449865 28.08019893243909 2.2463004402816296)
+;;; Best behaviors: (0.017000000923871994 45.66849958989769 40.292799700051546 41.954401166178286 40.45819927379489 0.019999999552965164 39.77730145864189 43.183400969952345 41.503098567947745 0.017999999225139618 39.84909937158227 42.71500151231885 47.33939845301211 42.91440083831549 0.01899999938905239 0.008999999612569809 39.24649823550135 38.91980106756091 39.75369955971837)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 1
 ;;; -------------------------------------------------------
-;;; Best plushy: (true boolean_negative exec_if false boolean_or false boolean_negative exec_if boolean_= boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_= close boolean_and boolean_= true boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive boolean_= boolean_= boolean_= exec_dup true boolean_positive in1 exec_if boolean_positive)
-;;; Best program: (true boolean_negative exec_if (false boolean_or false boolean_negative exec_if (boolean_= boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_=) (boolean_and boolean_= true boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive boolean_= boolean_= boolean_= exec_dup (true boolean_positive in1 exec_if (boolean_positive) ()))) ())
-;;; Best total error: 707.3146020825952
-;;; Best errors: (91.98299999907613 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.98000000044703 50.272098541259766 1.1524009704589844 48.859901428222656 64.98200000077486 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.98100000061095 15.99100000038743 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (0.017 45.4063 40.2561 40.7951 40.4166 0.02 39.7279 43.1524 41.1401 0.018 39.8317 42.4667 46.7959 42.6207 0.019 0.009 39.2171 38.88 39.7258)
+;;; Best plushy: (in1 float_+ float_+)
+;;; Best program: (in1 float_+ (float_+ ()))
+;;; Best total error: 705.8170021073893
+;;; Best errors: (91.98299999907613 42.33150041010231 1.707200299948454 48.045598833821714 49.54180072620511 64.98000000044703 50.22269854135811 1.183400969952345 48.496901432052255 64.98200000077486 50.15090062841773 0.7150015123188496 5.339398453012109 47.08559916168451 64.98100000061095 15.99100000038743 27.75350176449865 28.08019893243909 2.2463004402816296)
+;;; Best behaviors: (0.017000000923871994 45.66849958989769 40.292799700051546 41.954401166178286 40.45819927379489 0.019999999552965164 39.77730145864189 43.183400969952345 41.503098567947745 0.017999999225139618 39.84909937158227 42.71500151231885 47.33939845301211 42.91440083831549 0.01899999938905239 0.008999999612569809 39.24649823550135 38.91980106756091 39.75369955971837)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 2
 ;;; -------------------------------------------------------
-;;; Best plushy: (true boolean_negative exec_if false boolean_or false exec_if boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_= close boolean_and boolean_and true boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive in1 boolean_= boolean_= boolean_= exec_dup boolean_not true boolean_positive in1 exec_if boolean_positive)
-;;; Best program: (true boolean_negative exec_if (false boolean_or false exec_if (boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_=) (boolean_and boolean_and true boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive in1 boolean_= boolean_= boolean_= exec_dup (boolean_not true boolean_positive in1 exec_if (boolean_positive) ()))) ())
-;;; Best total error: 707.3146020825952
-;;; Best errors: (91.98299999907613 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.98000000044703 50.272098541259766 1.1524009704589844 48.859901428222656 64.98200000077486 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.98100000061095 15.99100000038743 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (0.017 45.4063 40.2561 40.7951 40.4166 0.02 39.7279 43.1524 41.1401 0.018 39.8317 42.4667 46.7959 42.6207 0.019 0.009 39.2171 38.88 39.7258)
+;;; Best plushy: (boolean_not e false boolean_= float_+ exec_if true in1 false close float_* boolean_= exec_if exec_dup boolean_and exec_dup e boolean_and float_+ close pi boolean_= float_+ true e float_+)
+;;; Best program: (boolean_not e false boolean_= float_+ (exec_if (true in1 false) (float_* boolean_= exec_if (exec_dup (boolean_and exec_dup (e boolean_and float_+ () pi boolean_= float_+ (true e float_+ ())))) ())))
+;;; Best total error: 613.4745798016602
+;;; Best errors: (54.96909292950942 50.96909292950942 4.969092929509422 52.96909292950942 52.96909292950942 27.969092929509422 52.96909292950942 4.969092929509422 52.96909292950942 27.969092929509422 52.96909292950942 4.969092929509422 4.969092929509422 52.96909292950942 27.969092929509422 21.030907070490578 29.969092929509422 29.969092929509422 4.969092929509422)
+;;; Best behaviors: (37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058 37.03090707049058)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 3
 ;;; -------------------------------------------------------
-;;; Best plushy: (true exec_if false boolean_or false boolean_= boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_= boolean_and boolean_= true boolean_or true boolean_positive e boolean_= boolean_not boolean_positive boolean_= boolean_= boolean_= exec_dup true boolean_positive in1 exec_if boolean_positive)
-;;; Best program: (true exec_if (false boolean_or false boolean_= boolean_and boolean_= boolean_or boolean_or boolean_and boolean_or boolean_= boolean_and boolean_= true boolean_or true boolean_positive e boolean_= boolean_not boolean_positive boolean_= boolean_= boolean_= exec_dup (true boolean_positive in1 exec_if (boolean_positive) ())) ())
-;;; Best total error: 707.3146020825952
-;;; Best errors: (91.98299999907613 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.98000000044703 50.272098541259766 1.1524009704589844 48.859901428222656 64.98200000077486 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.98100000061095 15.99100000038743 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (0.017 45.4063 40.2561 40.7951 40.4166 0.02 39.7279 43.1524 41.1401 0.018 39.8317 42.4667 46.7959 42.6207 0.019 0.009 39.2171 38.88 39.7258)
+;;; Best plushy: (boolean_not e false boolean_= float_+ exec_if float_= true in1 false close float_* boolean_= exec_if exec_dup boolean_and exec_dup e boolean_and exec_dup float_+ close pi boolean_= true float_+ true e float_+)
+;;; Best program: (boolean_not e false boolean_= float_+ (exec_if (float_= true in1 false) (float_* boolean_= exec_if (exec_dup (boolean_and exec_dup (e boolean_and exec_dup (float_+ () pi boolean_= true float_+ (true e float_+ ()))))) ())))
+;;; Best total error: 519.8013533563089
+;;; Best errors: (48.685907622329836 44.685907622329836 1.314092377670164 46.685907622329836 46.685907622329836 21.685907622329836 46.685907622329836 1.314092377670164 46.685907622329836 21.685907622329836 46.685907622329836 1.314092377670164 1.314092377670164 46.685907622329836 21.685907622329836 27.314092377670164 23.685907622329836 23.685907622329836 1.314092377670164)
+;;; Best behaviors: (43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164 43.314092377670164)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 4
 ;;; -------------------------------------------------------
-;;; Best plushy: (true exec_if false boolean_or boolean_positive false exec_if boolean_= boolean_and boolean_= boolean_or boolean_or in1 boolean_and boolean_or boolean_= close boolean_and boolean_and true boolean_or boolean_positive boolean_negative true e boolean_negative boolean_= boolean_not boolean_positive boolean_= boolean_= exec_dup true boolean_positive in1 exec_if boolean_positive)
-;;; Best program: (true exec_if (false boolean_or boolean_positive false exec_if (boolean_= boolean_and boolean_= boolean_or boolean_or in1 boolean_and boolean_or boolean_=) (boolean_and boolean_and true boolean_or boolean_positive boolean_negative true e boolean_negative boolean_= boolean_not boolean_positive boolean_= boolean_= exec_dup (true boolean_positive in1 exec_if (boolean_positive) ()))) ())
-;;; Best total error: 707.3146020825952
-;;; Best errors: (91.98299999907613 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.98000000044703 50.272098541259766 1.1524009704589844 48.859901428222656 64.98200000077486 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.98100000061095 15.99100000038743 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (0.017 45.4063 40.2561 40.7951 40.4166 0.02 39.7279 43.1524 41.1401 0.018 39.8317 42.4667 46.7959 42.6207 0.019 0.009 39.2171 38.88 39.7258)
+;;; Best plushy: (float_* exec_if pi boolean_or exec_if e exec_dup float_* float_- float_+ boolean_and float_- exec_if float_* e true float_* pi false float_+ boolean_= exec_if float_- exec_if close float_*)
+;;; Best program: (float_* exec_if (pi boolean_or exec_if (e exec_dup (float_* float_- float_+ (boolean_and float_- exec_if (float_* e true float_* pi false float_+ (boolean_= exec_if (float_- exec_if () (float_*)) ())) ()))) ()) ())
+;;; Best total error: 389.3457063526689
+;;; Best errors: (17.21809788244373 13.218097882443729 32.78190211755627 15.218097882443729 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 32.78190211755627 15.218097882443729 9.781902117556271 58.78190211755627 7.781902117556271 7.781902117556271 32.78190211755627)
+;;; Best behaviors: (74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 5
 ;;; -------------------------------------------------------
-;;; Best plushy: (true boolean_negative boolean_= exec_if false boolean_negative boolean_or false boolean_negative exec_if boolean_and boolean_= boolean_and boolean_= boolean_= boolean_or boolean_or boolean_and boolean_or boolean_= close boolean_and exec_if boolean_= true close boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive boolean_= boolean_= exec_dup true boolean_positive in1 exec_if boolean_positive)
-;;; Best program: (true boolean_negative boolean_= exec_if (false boolean_negative boolean_or false boolean_negative exec_if (boolean_and boolean_= boolean_and boolean_= boolean_= boolean_or boolean_or boolean_and boolean_or boolean_=) (boolean_and exec_if (boolean_= true) (boolean_or true boolean_positive boolean_negative true e boolean_= boolean_not boolean_positive boolean_= boolean_= exec_dup (true boolean_positive in1 exec_if (boolean_positive) ())))) ())
-;;; Best total error: 707.3146020825952
-;;; Best errors: (91.98299999907613 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.98000000044703 50.272098541259766 1.1524009704589844 48.859901428222656 64.98200000077486 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.98100000061095 15.99100000038743 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (0.017 45.4063 40.2561 40.7951 40.4166 0.02 39.7279 43.1524 41.1401 0.018 39.8317 42.4667 46.7959 42.6207 0.019 0.009 39.2171 38.88 39.7258)
+;;; Best plushy: (float_* exec_if pi boolean_or exec_if e exec_dup float_* float_- float_+ boolean_and float_- exec_if float_* e true float_* pi false float_+ boolean_= exec_if float_- exec_if close float_*)
+;;; Best program: (float_* exec_if (pi boolean_or exec_if (e exec_dup (float_* float_- float_+ (boolean_and float_- exec_if (float_* e true float_* pi false float_+ (boolean_= exec_if (float_- exec_if () (float_*)) ())) ()))) ()) ())
+;;; Best total error: 389.3457063526689
+;;; Best errors: (17.21809788244373 13.218097882443729 32.78190211755627 15.218097882443729 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 32.78190211755627 15.218097882443729 9.781902117556271 58.78190211755627 7.781902117556271 7.781902117556271 32.78190211755627)
+;;; Best behaviors: (74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 6
 ;;; -------------------------------------------------------
-;;; Best plushy: (true true exec_if boolean_or close boolean_or boolean_positive boolean_= exec_if boolean_positive boolean_and boolean_= close boolean_or boolean_or boolean_positive close boolean_= boolean_or close boolean_not true exec_dup false boolean_or boolean_positive boolean_negative e boolean_positive boolean_= boolean_positive boolean_positive exec_if boolean_= exec_dup in1 boolean_positive)
-;;; Best program: (true true exec_if (boolean_or) (boolean_or boolean_positive boolean_= exec_if (boolean_positive boolean_and boolean_=) (boolean_or boolean_or boolean_positive) boolean_= boolean_or) boolean_not true exec_dup (false boolean_or boolean_positive boolean_negative e boolean_positive boolean_= boolean_positive boolean_positive exec_if (boolean_= exec_dup (in1 boolean_positive)) ()))
-;;; Best total error: 702.3976020812988
-;;; Best errors: (91.0 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.0 50.272098541259766 1.1524009704589844 48.859901428222656 64.0 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.0 15.0 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (1.0 45.4063 40.2561 40.7951 40.4166 1.0 39.7279 43.1524 41.1401 1.0 39.8317 42.4667 46.7959 42.6207 1.0 1.0 39.2171 38.88 39.7258)
+;;; Best plushy: (float_* exec_if pi boolean_or exec_if e exec_dup float_* float_+ boolean_and float_- exec_if float_* e true float_* pi false float_+ boolean_= float_- exec_if close float_*)
+;;; Best program: (float_* exec_if (pi boolean_or exec_if (e exec_dup (float_* float_+ (boolean_and float_- exec_if (float_* e true float_* pi false float_+ (boolean_= float_- exec_if () (float_*))) ()))) ()) ())
+;;; Best total error: 389.3457063526689
+;;; Best errors: (17.21809788244373 13.218097882443729 32.78190211755627 15.218097882443729 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 32.78190211755627 15.218097882443729 9.781902117556271 58.78190211755627 7.781902117556271 7.781902117556271 32.78190211755627)
+;;; Best behaviors: (74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 7
 ;;; -------------------------------------------------------
-;;; Best plushy: (true true exec_if boolean_or close boolean_or boolean_positive boolean_= exec_if boolean_positive boolean_and boolean_= close boolean_or boolean_or boolean_positive close boolean_= boolean_or close boolean_not true exec_dup false boolean_or boolean_positive boolean_negative e boolean_positive boolean_= boolean_positive boolean_positive exec_if boolean_= exec_dup in1 boolean_positive)
-;;; Best program: (true true exec_if (boolean_or) (boolean_or boolean_positive boolean_= exec_if (boolean_positive boolean_and boolean_=) (boolean_or boolean_or boolean_positive) boolean_= boolean_or) boolean_not true exec_dup (false boolean_or boolean_positive boolean_negative e boolean_positive boolean_= boolean_positive boolean_positive exec_if (boolean_= exec_dup (in1 boolean_positive)) ()))
-;;; Best total error: 702.3976020812988
-;;; Best errors: (91.0 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 64.0 50.272098541259766 1.1524009704589844 48.859901428222656 64.0 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 64.0 15.0 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (1.0 45.4063 40.2561 40.7951 40.4166 1.0 39.7279 43.1524 41.1401 1.0 39.8317 42.4667 46.7959 42.6207 1.0 1.0 39.2171 38.88 39.7258)
+;;; Best plushy: (float_* exec_if pi boolean_or exec_if e exec_dup float_* float_+ boolean_and float_- exec_if float_* e true float_* pi false float_+ boolean_= float_- exec_if close float_*)
+;;; Best program: (float_* exec_if (pi boolean_or exec_if (e exec_dup (float_* float_+ (boolean_and float_- exec_if (float_* e true float_* pi false float_+ (boolean_= float_- exec_if () (float_*))) ()))) ()) ())
+;;; Best total error: 389.3457063526689
+;;; Best errors: (17.21809788244373 13.218097882443729 32.78190211755627 15.218097882443729 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 15.218097882443729 9.781902117556271 15.218097882443729 32.78190211755627 32.78190211755627 15.218097882443729 9.781902117556271 58.78190211755627 7.781902117556271 7.781902117556271 32.78190211755627)
+;;; Best behaviors: (74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627 74.78190211755627)
 ;;; 
 ;;; -------------------------------------------------------
 ;;;                Report for Generation 8
 ;;; -------------------------------------------------------
-;;; Best plushy: (true close boolean_positive e false boolean_positive boolean_positive close boolean_= e boolean_= in1 boolean_and boolean_= boolean_or pi in1 close boolean_= boolean_positive close boolean_not boolean_or true true e boolean_positive true exec_dup boolean_negative e boolean_and boolean_positive false boolean_not false boolean_not boolean_= boolean_positive boolean_= boolean_or boolean_= exec_dup boolean_positive exec_if boolean_positive)
-;;; Best program: (true boolean_positive e false boolean_positive boolean_positive boolean_= e boolean_= in1 boolean_and boolean_= boolean_or pi in1 boolean_= boolean_positive boolean_not boolean_or true true e boolean_positive true exec_dup (boolean_negative e boolean_and boolean_positive false boolean_not false boolean_not boolean_= boolean_positive boolean_= boolean_or boolean_= exec_dup (boolean_positive exec_if (boolean_positive) ())))
-;;; Best total error: 691.6896388133499
-;;; Best errors: (88.8584073464102 42.59370040893555 1.7439002990722656 49.204898834228516 49.58340072631836 61.8584073464102 50.272098541259766 1.1524009704589844 48.859901428222656 61.8584073464102 50.16830062866211 0.4667015075683594 4.7958984375 47.37929916381836 61.8584073464102 12.858407346410207 27.782901763916016 28.119998931884766 2.274200439453125)
-;;; Best behaviors: (3.141592653589793 45.4063 40.2561 40.7951 40.4166 3.141592653589793 39.7279 43.1524 41.1401 3.141592653589793 39.8317 42.4667 46.7959 42.6207 3.141592653589793 3.141592653589793 39.2171 38.88 39.7258)
+;;; Best plushy: (exec_if float_* false float_- boolean_= e exec_dup true true true boolean_not boolean_not boolean_= boolean_= true float_* float_= exec_if pi float_+ boolean_= close float_* pi boolean_= exec_if exec_if boolean_and exec_dup close exec_if float_* pi float_+ false true close)
+;;; Best program: (exec_if (float_* false float_- boolean_= e exec_dup (true true true boolean_not boolean_not boolean_= boolean_= true float_* float_= exec_if (pi float_+ (boolean_=) float_* pi boolean_= exec_if (exec_if (boolean_and exec_dup () exec_if (float_* pi float_+ (false true)) ()) ()) ()) ())) ())
+;;; Best total error: 377.53752009761865
+;;; Best errors: (21.154159967460416 17.154159967460416 28.845840032539584 19.154159967460416 19.154159967460416 5.845840032539584 19.154159967460416 28.845840032539584 19.154159967460416 5.845840032539584 19.154159967460416 28.845840032539584 28.845840032539584 19.154159967460416 5.845840032539584 54.845840032539584 3.8458400325395843 3.8458400325395843 28.845840032539584)
+;;; Best behaviors: (70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 9
+;;; -------------------------------------------------------
+;;; Best plushy: (exec_if float_* false float_- boolean_= e exec_dup true true true boolean_not boolean_not boolean_= boolean_= true float_* float_= exec_if pi float_+ boolean_= close float_* pi boolean_= exec_if exec_if boolean_and exec_dup close exec_if float_* pi float_+ false true close)
+;;; Best program: (exec_if (float_* false float_- boolean_= e exec_dup (true true true boolean_not boolean_not boolean_= boolean_= true float_* float_= exec_if (pi float_+ (boolean_=) float_* pi boolean_= exec_if (exec_if (boolean_and exec_dup () exec_if (float_* pi float_+ (false true)) ()) ()) ()) ())) ())
+;;; Best total error: 377.53752009761865
+;;; Best errors: (21.154159967460416 17.154159967460416 28.845840032539584 19.154159967460416 19.154159967460416 5.845840032539584 19.154159967460416 28.845840032539584 19.154159967460416 5.845840032539584 19.154159967460416 28.845840032539584 28.845840032539584 19.154159967460416 5.845840032539584 54.845840032539584 3.8458400325395843 3.8458400325395843 28.845840032539584)
+;;; Best behaviors: (70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 10
+;;; -------------------------------------------------------
+;;; Best plushy: (exec_if float_* false float_- boolean_= e exec_dup true true true boolean_= boolean_= float_* float_= exec_if pi float_+ boolean_= close float_* pi boolean_= exec_if exec_if boolean_and exec_dup close exec_if float_* pi float_+ false true close)
+;;; Best program: (exec_if (float_* false float_- boolean_= e exec_dup (true true true boolean_= boolean_= float_* float_= exec_if (pi float_+ (boolean_=) float_* pi boolean_= exec_if (exec_if (boolean_and exec_dup () exec_if (float_* pi float_+ (false true)) ()) ()) ()) ())) ())
+;;; Best total error: 377.53752009761865
+;;; Best errors: (21.154159967460416 17.154159967460416 28.845840032539584 19.154159967460416 19.154159967460416 5.845840032539584 19.154159967460416 28.845840032539584 19.154159967460416 5.845840032539584 19.154159967460416 28.845840032539584 28.845840032539584 19.154159967460416 5.845840032539584 54.845840032539584 3.8458400325395843 3.8458400325395843 28.845840032539584)
+;;; Best behaviors: (70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958 70.84584003253958)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 11
+;;; -------------------------------------------------------
+;;; Best plushy: (float_* float_* pi boolean_or exec_if float_* exec_dup float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if float_+ boolean_= exec_if float_+ boolean_= exec_if true close exec_if exec_if float_* pi float_*)
+;;; Best program: (float_* float_* pi boolean_or exec_if (float_* exec_dup (float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if (float_+ (boolean_= exec_if (float_+ (boolean_= exec_if (true) (exec_if (exec_if (float_* pi float_*) ()) ()))) ())) ())) ())
+;;; Best total error: 366.62562279946604
+;;; Best errors: (25.625622799466 21.625622799466 24.374377200534 23.625622799466 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 24.374377200534 23.625622799466 1.3743772005339991 50.374377200534 0.6256227994660009 0.6256227994660009 24.374377200534)
+;;; Best behaviors: (66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 12
+;;; -------------------------------------------------------
+;;; Best plushy: (float_* float_* pi boolean_or exec_if float_* exec_dup float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if boolean_= exec_if float_+ boolean_= exec_if true close exec_if exec_if float_* pi float_*)
+;;; Best program: (float_* float_* pi boolean_or exec_if (float_* exec_dup (float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if (boolean_= exec_if (float_+ (boolean_= exec_if (true) (exec_if (exec_if (float_* pi float_*) ()) ()))) ()) ())) ())
+;;; Best total error: 366.62562279946604
+;;; Best errors: (25.625622799466 21.625622799466 24.374377200534 23.625622799466 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 24.374377200534 23.625622799466 1.3743772005339991 50.374377200534 0.6256227994660009 0.6256227994660009 24.374377200534)
+;;; Best behaviors: (66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 13
+;;; -------------------------------------------------------
+;;; Best plushy: (false pi float_= boolean_or exec_if exec_dup close true boolean_and float_- close boolean_= exec_dup e float_* exec_dup float_+ float_+ e true float_+ exec_if boolean_or exec_if pi float_+)
+;;; Best program: (false pi float_= boolean_or exec_if (exec_dup () true boolean_and float_-) (boolean_= exec_dup (e float_* exec_dup (float_+ (float_+ (e true float_+ (exec_if (boolean_or exec_if (pi float_+ ()) ()) ())))))))
+;;; Best total error: 366.2092660353305
+;;; Best errors: (25.209266035330515 21.209266035330515 24.790733964669485 23.209266035330515 23.209266035330515 1.790733964669485 23.209266035330515 24.790733964669485 23.209266035330515 1.790733964669485 23.209266035330515 24.790733964669485 24.790733964669485 23.209266035330515 1.790733964669485 50.790733964669485 0.2092660353305149 0.2092660353305149 24.790733964669485)
+;;; Best behaviors: (66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949 66.79073396466949)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 14
+;;; -------------------------------------------------------
+;;; Best plushy: (exec_if float_* pi boolean_or exec_if float_* exec_dup float_* true boolean_and boolean_or boolean_= boolean_= e true boolean_= boolean_= exec_if float_+ boolean_= pi exec_if true exec_if float_*)
+;;; Best program: (exec_if (float_* pi boolean_or exec_if (float_* exec_dup (float_* true boolean_and boolean_or boolean_= boolean_= e true boolean_= boolean_= exec_if (float_+ (boolean_= pi exec_if (true exec_if (float_*) ()) ())) ())) ()) ())
+;;; Best total error: 366.62562279946604
+;;; Best errors: (25.625622799466 21.625622799466 24.374377200534 23.625622799466 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 24.374377200534 23.625622799466 1.3743772005339991 50.374377200534 0.6256227994660009 0.6256227994660009 24.374377200534)
+;;; Best behaviors: (66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 15
+;;; -------------------------------------------------------
+;;; Best plushy: (float_* float_* pi boolean_or exec_if float_* exec_dup float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if boolean_= exec_if float_+ boolean_= exec_if true close exec_if exec_if float_* pi float_*)
+;;; Best program: (float_* float_* pi boolean_or exec_if (float_* exec_dup (float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if (boolean_= exec_if (float_+ (boolean_= exec_if (true) (exec_if (exec_if (float_* pi float_*) ()) ()))) ()) ())) ())
+;;; Best total error: 366.62562279946604
+;;; Best errors: (25.625622799466 21.625622799466 24.374377200534 23.625622799466 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 24.374377200534 23.625622799466 1.3743772005339991 50.374377200534 0.6256227994660009 0.6256227994660009 24.374377200534)
+;;; Best behaviors: (66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 16
+;;; -------------------------------------------------------
+;;; Best plushy: (float_* float_* pi boolean_or exec_if float_* exec_dup float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if boolean_= boolean_= exec_if float_+ boolean_= exec_if true close exec_if exec_if float_* pi float_*)
+;;; Best program: (float_* float_* pi boolean_or exec_if (float_* exec_dup (float_* true boolean_and boolean_or boolean_= boolean_= e true exec_if (boolean_= boolean_= exec_if (float_+ (boolean_= exec_if (true) (exec_if (exec_if (float_* pi float_*) ()) ()))) ()) ())) ())
+;;; Best total error: 366.62562279946604
+;;; Best errors: (25.625622799466 21.625622799466 24.374377200534 23.625622799466 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 24.374377200534 23.625622799466 1.3743772005339991 50.374377200534 0.6256227994660009 0.6256227994660009 24.374377200534)
+;;; Best behaviors: (66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 17
+;;; -------------------------------------------------------
+;;; Best plushy: (float_* float_* pi boolean_or exec_if float_* exec_dup true boolean_and boolean_or boolean_= e true exec_if boolean_= boolean_= exec_if float_+ boolean_= exec_if true close exec_if exec_if float_* pi float_*)
+;;; Best program: (float_* float_* pi boolean_or exec_if (float_* exec_dup (true boolean_and boolean_or boolean_= e true exec_if (boolean_= boolean_= exec_if (float_+ (boolean_= exec_if (true) (exec_if (exec_if (float_* pi float_*) ()) ()))) ()) ())) ())
+;;; Best total error: 366.62562279946604
+;;; Best errors: (25.625622799466 21.625622799466 24.374377200534 23.625622799466 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 23.625622799466 1.3743772005339991 23.625622799466 24.374377200534 24.374377200534 23.625622799466 1.3743772005339991 50.374377200534 0.6256227994660009 0.6256227994660009 24.374377200534)
+;;; Best behaviors: (66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534 66.374377200534)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 18
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi boolean_or exec_if boolean_or e float_* float_+ boolean_and float_- float_- exec_if e e float_* float_* pi false float_+ exec_if close exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi boolean_or exec_if (boolean_or e float_* float_+ (boolean_and float_- float_- exec_if (e e float_* float_* pi false float_+ (exec_if () (exec_if (float_*) ()))) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 19
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi boolean_or exec_if e float_* float_+ boolean_and float_- float_- exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi boolean_or exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_*) ()) ())) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 20
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi boolean_or exec_if boolean_or e float_* float_+ boolean_and float_- float_- exec_if e e float_* float_* pi false float_+ close exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi boolean_or exec_if (boolean_or e float_* float_+ (boolean_and float_- float_- exec_if (e e float_* float_* pi false float_+ () exec_if (float_*) ()) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 21
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi boolean_and exec_if e float_* float_+ boolean_and float_- float_- exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi boolean_and exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_*) ()) ())) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 22
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_not boolean_or exec_if exec_if pi boolean_or exec_if boolean_or e float_* float_+ boolean_and float_- close float_- exec_if e e float_* float_* pi false float_+ close exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_not boolean_or exec_if (exec_if (pi boolean_or exec_if (boolean_or e float_* float_+ (boolean_and float_-) float_- exec_if (e e float_* float_* pi false float_+ () exec_if (float_*) ()) ()) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 23
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi exec_if e float_* float_+ boolean_and float_- float_- exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_*) ()) ())) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 24
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_not boolean_or exec_if exec_if pi boolean_or exec_if boolean_or e float_* float_+ boolean_and float_- close float_- e e float_* float_* pi false float_+ close exec_if close)
+;;; Best program: (in1 float_* float_* boolean_not boolean_or exec_if (exec_if (pi boolean_or exec_if (boolean_or e float_* float_+ (boolean_and float_-) float_- e e float_* float_* pi false float_+ () exec_if () ()) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 25
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi boolean_and exec_if e float_* float_+ boolean_and float_- float_- exec_if exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi boolean_and exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_*) ()) ())) ()) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 26
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if pi boolean_and exec_if e float_* float_+ boolean_and float_- float_- exec_if exec_if e e float_* float_* pi false float_+ exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (pi boolean_and exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (exec_if (e e float_* float_* pi false float_+ (exec_if (float_*) ())) ()) ())) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 27
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if pi boolean_and exec_if e float_* float_+ boolean_= boolean_and float_- float_- exec_if exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* boolean_not close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (pi boolean_and exec_if (e float_* float_+ (boolean_= boolean_and float_- float_- exec_if (exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_* boolean_not) ()) ())) ()) ())) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 28
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi boolean_and exec_if e float_* float_+ boolean_and float_- float_- exec_if exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi boolean_and exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_*) ()) ())) ()) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 29
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if exec_if pi boolean_and exec_if e float_* float_+ boolean_and float_- float_- exec_if exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (exec_if (pi boolean_and exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_*) ()) ())) ()) ())) ()) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 30
+;;; -------------------------------------------------------
+;;; Best plushy: (in1 float_* float_* boolean_or exec_if pi boolean_and exec_if e float_* float_+ boolean_and float_- float_- exec_if exec_if e e float_* float_* pi false float_+ exec_if exec_if float_* float_* close)
+;;; Best program: (in1 float_* float_* boolean_or exec_if (pi boolean_and exec_if (e float_* float_+ (boolean_and float_- float_- exec_if (exec_if (e e float_* float_* pi false float_+ (exec_if (exec_if (float_* float_*) ()) ())) ()) ())) ()) ())
+;;; Best total error: 341.957578118314
+;;; Best errors: (25.757832105117302 19.744212736656863 24.383095144655314 21.160893900459627 23.98710001832842 1.242167894882698 23.934084493656457 24.193119497411573 21.104252159498444 1.242167894882698 24.020145418487502 22.930632312616197 7.53001515890594 23.661496456457897 1.242167894882698 50.2421678948827 0.6516305799995195 0.7955422773908793 24.134854279141337)
+;;; Best behaviors: (66.2421678948827 68.25578726334314 66.38309514465531 68.83910609954037 66.01289998167158 66.2421678948827 66.06591550634354 66.19311949741157 68.89574784050156 66.2421678948827 65.9798545815125 64.9306323126162 49.53001515890594 66.3385035435421 66.2421678948827 66.2421678948827 66.34836942000048 66.20445772260912 66.13485427914134)
 ;;; 
 ;;; 
 ;; <-
+;; =>
+;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
+;; <=
+
+;; @@
+
+
+;; @@
+
+;; @@
+
+;; @@
 
 ;; @@
 
