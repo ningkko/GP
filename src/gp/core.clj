@@ -2,6 +2,6 @@
   (:gen-class))
 
 (defn -main
-  "'lein run gp.abs'."
+  "'lein run gp.ast'."
   [& args]
   (require (symbol (first args))))
