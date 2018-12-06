@@ -63,9 +63,9 @@
 
 (defn write-data
   [error filename]
-  (with-open [writer (io/writer (concat filename ".csv"))]
+  (with-open [writer (io/writer (str "error/" filename ".csv"))]
     (csv/write-csv writer
-                   [error])))
+                   [[error]])))
 ;;(defn get-input
 ;  [filename]
 ;  (rest (map #(map to-float (drop-last (read-row filename %))) 
@@ -78,7 +78,7 @@
 ;         (rest (take 21 (read-column file-name 11))))))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.ast/get-target</span>","value":"#'gp.ast/get-target"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.ast/write-data</span>","value":"#'gp.ast/write-data"}
 ;; <=
 
 ;; @@
@@ -740,15 +740,12 @@
 ;; @@
 
 ;; @@
-;;(-main)
+(-main)
 ;; @@
-
-;; @@
-
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
+;; ->
+;;; Starting GP with args: {:max-initial-plushy-size 80, :bit-mutation true, :crossover :uniform-crossover, :mutation-rate 1, :instructions (in1 exec_dup exec_if boolean_and boolean_or boolean_not boolean_= close true false pi e float_negative float_positive float_absolute float_sqrt float_cbrt float_+ float_- float_* float_% float_= random-coefficient), :max-generations 100, :parent-selection :lexicase, :tournament-size 8, :out-file tournament1, :step-limit 10, :error-function #function[gp.ast/regression-error-function], :population-size 200}
+;;; 
+;; <-
 
 ;; @@
 
