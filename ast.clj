@@ -52,45 +52,52 @@
       (float evaluated-input))))
 
 (defn get-input
+  "gets all input from the file"
   [filename]
   (rest (map #(map to-float (drop-last (read-row filename %))) 
              (range (count (read-column filename 0))))))
 (defn get-target
+  "gets all target from the file"
   [file-name]
   (doall
     (map #(float (read-string %))
          (rest (read-column file-name 11)))))
 
-(defn write-data
-  [error filename]
-  (with-open [writer (io/writer (str "error/" filename ".csv"))]
-    (csv/write-csv writer
-                   [[error]])))
-;;(defn get-input
-;  [filename]
-;  (rest (map #(map to-float (drop-last (read-row filename %))) 
-;             (range 20))))
+(defn get-sample-input
+  "gets a small sample of input"
+  [filename size]
+  (rest (map #(map to-float (drop-last (read-row filename %))) 
+             (range size))))
 
-;(defn get-target
-;  [file-name]
-;  (doall
-;    (map to-float
-;         (rest (take 21 (read-column file-name 11))))))
+(defn get-sample-target
+  "gets a small sample of target"
+  [file-name size]
+  (doall
+    (map to-float
+         (rest (take (inc size) (read-column file-name 11))))))
+
+(defn write-data
+  "writes data into a given directory"
+  [out-file data]
+  (if (.exists (io/as-file out-file))
+     (spit out-file(vec (concat (read-string (slurp out-file)) data)))
+    (spit out-file data)))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.ast/write-data</span>","value":"#'gp.ast/write-data"}
 ;; <=
 
 ;; @@
+(def input (get-sample-input data-addr 100))
 
-(def input (get-input data-addr))
+(def target (get-sample-target data-addr 100))
 
-(def target (get-target data-addr))
+(def target-type (apply vector (distinct target)))
 
-
+;;target-type
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.ast/target</span>","value":"#'gp.ast/target"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;gp.ast/target-type</span>","value":"#'gp.ast/target-type"}
 ;; <=
 
 ;; @@
@@ -111,8 +118,8 @@
     false
   ;;============== new functions ================
    
-    'pi
-    'e
+    ;'pi
+    ;'e
     'float_negative
     'float_positive
     'float_absolute
@@ -123,7 +130,7 @@
     'float_*
     'float_%
     'float_=
-   	'random-coefficient
+   	;'random-coefficient
    ))
 
 
@@ -135,8 +142,7 @@
 
 (def opens ; number of blocks opened by instructions (default = 0)
   {'exec_dup 1 
-   'exec_if 2
-   'float_+ 1})
+   'exec_if 2})
 
 
 ;; @@
@@ -648,7 +654,7 @@
     (print "Best plushy: ") (prn (:plushy best))
     (print "Best program: ") (prn (push-from-plushy (:plushy best)))
     (println "Best total error:" (:total-error best))
-    (write-data (:total-error best) filename)
+    ;(write-data (vector (:total-error best)) filename)
     (println "Best errors:" (:errors best))
     (println "Best behaviors:" (:behaviors best))
     (println)))
@@ -670,6 +676,8 @@
                                       population))]
       (report evaluated-pop generation (:out-file argmap))
       (cond
+        
+        
         (zero? (:total-error (first evaluated-pop))) (println "SUCCESS")
         (>= generation max-generations) nil
         :else (recur (inc generation)
@@ -682,7 +690,6 @@
   (let [program (push-from-plushy (:plushy individual))
         inputs input
         correct-outputs target
-
         outputs (map (fn [input]
                        (peek-stack
                         (interpret-program 
@@ -714,16 +721,16 @@
   (binding [*ns* (the-ns 'gp.ast)]
     (propel-gp (update-in (merge {:instructions default-instructions
                                   :error-function regression-error-function
-                                  :max-generations 100
+                                  :max-generations 500
                                   :population-size 200
-                                  :max-initial-plushy-size 80
+                                  :max-initial-plushy-size 30
                                   :step-limit 10
                                   :parent-selection :lexicase
                                   :tournament-size 8
-                                  :mutation-rate 1
+                                  :mutation-rate 0.06
                                   :crossover :uniform-crossover
-                                  :bit-mutation true
-                                  :out-file "tournament1"}
+                                  :bit-mutation false
+                                  :out-file "error/lexicase.csv"}
                                  (apply hash-map
                                         (map read-string args)))
                           [:error-function]
@@ -736,14 +743,316 @@
 ;; <=
 
 ;; @@
-
-;; @@
-
-;; @@
-(-main)
+;(-main)
 ;; @@
 ;; ->
-;;; Starting GP with args: {:max-initial-plushy-size 80, :bit-mutation true, :crossover :uniform-crossover, :mutation-rate 1, :instructions (in1 exec_dup exec_if boolean_and boolean_or boolean_not boolean_= close true false pi e float_negative float_positive float_absolute float_sqrt float_cbrt float_+ float_- float_* float_% float_= random-coefficient), :max-generations 100, :parent-selection :lexicase, :tournament-size 8, :out-file tournament1, :step-limit 10, :error-function #function[gp.ast/regression-error-function], :population-size 200}
+;;; Starting GP with args: {:max-initial-plushy-size 30, :bit-mutation false, :crossover :uniform-crossover, :mutation-rate 0.06, :instructions (in1 exec_dup exec_if boolean_and boolean_or boolean_not boolean_= close true false float_negative float_positive float_absolute float_sqrt float_cbrt float_+ float_- float_* float_% float_=), :max-generations 500, :parent-selection :lexicase, :tournament-size 8, :out-file error/lexicase.csv, :step-limit 10, :error-function #function[gp.ast/regression-error-function], :population-size 200}
+;;; -------------------------------------------------------
+;;;                Report for Generation 0
+;;; -------------------------------------------------------
+;;; Best plushy: (float_= float_% in1 float_sqrt float_cbrt in1 boolean_or float_- float_positive float_* boolean_not boolean_or float_negative exec_if close float_cbrt float_- boolean_= float_- float_+ boolean_not true float_negative float_= boolean_or boolean_not float_cbrt float_+ exec_dup)
+;;; Best program: (float_= float_% in1 float_sqrt float_cbrt in1 boolean_or float_- float_positive float_* boolean_not boolean_or float_negative exec_if () (float_cbrt float_- boolean_= float_- float_+ boolean_not true float_negative float_= boolean_or boolean_not float_cbrt float_+ exec_dup ()))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 1
+;;; -------------------------------------------------------
+;;; Best plushy: (float_positive true in1)
+;;; Best program: (float_positive true in1)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 2
+;;; -------------------------------------------------------
+;;; Best plushy: (float_positive boolean_not in1 float_- exec_dup float_% float_positive false exec_if boolean_not float_%)
+;;; Best program: (float_positive boolean_not in1 float_- exec_dup (float_% float_positive false exec_if (boolean_not float_%) ()))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 3
+;;; -------------------------------------------------------
+;;; Best plushy: (true true in1 exec_if)
+;;; Best program: (true true in1 exec_if () ())
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 4
+;;; -------------------------------------------------------
+;;; Best plushy: (float_negative float_% in1 float_sqrt boolean_or in1 boolean_or float_- boolean_not float_- float_positive in1 false float_positive close float_cbrt float_sqrt boolean_= float_% true true float_cbrt boolean_not)
+;;; Best program: (float_negative float_% in1 float_sqrt boolean_or in1 boolean_or float_- boolean_not float_- float_positive in1 false float_positive float_cbrt float_sqrt boolean_= float_% true true float_cbrt boolean_not)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 5
+;;; -------------------------------------------------------
+;;; Best plushy: (boolean_= float_positive in1 exec_dup close boolean_not boolean_and float_- float_cbrt false float_positive float_* in1 float_* float_* float_* float_+ float_- float_positive float_sqrt false boolean_not boolean_not)
+;;; Best program: (boolean_= float_positive in1 exec_dup () boolean_not boolean_and float_- float_cbrt false float_positive float_* in1 float_* float_* float_* float_+ float_- float_positive float_sqrt false boolean_not boolean_not)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 6
+;;; -------------------------------------------------------
+;;; Best plushy: (float_negative float_positive in1 boolean_and boolean_or in1 false true boolean_not boolean_and float_absolute in1 float_* exec_dup float_cbrt)
+;;; Best program: (float_negative float_positive in1 boolean_and boolean_or in1 false true boolean_not boolean_and float_absolute in1 float_* exec_dup (float_cbrt))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 7
+;;; -------------------------------------------------------
+;;; Best plushy: (float_sqrt float_% in1 true float_* float_+ float_- in1 float_sqrt float_* float_* boolean_or float_negative float_* float_% float_cbrt float_- float_* float_+ float_+ boolean_or float_positive float_cbrt float_negative float_= boolean_or boolean_not float_+)
+;;; Best program: (float_sqrt float_% in1 true float_* float_+ float_- in1 float_sqrt float_* float_* boolean_or float_negative float_* float_% float_cbrt float_- float_* float_+ float_+ boolean_or float_positive float_cbrt float_negative float_= boolean_or boolean_not float_+)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 8
+;;; -------------------------------------------------------
+;;; Best plushy: (float_negative float_positive in1 boolean_and boolean_not float_cbrt float_cbrt boolean_not boolean_not boolean_and float_positive in1 float_positive boolean_or float_% float_+ float_cbrt)
+;;; Best program: (float_negative float_positive in1 boolean_and boolean_not float_cbrt float_cbrt boolean_not boolean_not boolean_and float_positive in1 float_positive boolean_or float_% float_+ float_cbrt)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 9
+;;; -------------------------------------------------------
+;;; Best plushy: (boolean_= float_positive in1 float_* exec_dup float_sqrt in1 boolean_not float_positive true float_positive exec_if float_* boolean_not float_% float_negative float_+ float_* false float_+)
+;;; Best program: (boolean_= float_positive in1 float_* exec_dup (float_sqrt in1 boolean_not float_positive true float_positive exec_if (float_* boolean_not float_% float_negative float_+ float_* false float_+) ()))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 10
+;;; -------------------------------------------------------
+;;; Best plushy: (float_sqrt float_% in1 boolean_and in1 float_cbrt in1 float_= boolean_not close float_* boolean_or float_negative boolean_not float_%)
+;;; Best program: (float_sqrt float_% in1 boolean_and in1 float_cbrt in1 float_= boolean_not float_* boolean_or float_negative boolean_not float_%)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 11
+;;; -------------------------------------------------------
+;;; Best plushy: (float_positive float_% in1 exec_dup float_cbrt float_cbrt float_cbrt float_- exec_if boolean_= float_sqrt true float_* exec_dup float_* float_+ boolean_not in1 float_= float_+)
+;;; Best program: (float_positive float_% in1 exec_dup (float_cbrt float_cbrt float_cbrt float_- exec_if (boolean_= float_sqrt true float_* exec_dup (float_* float_+ boolean_not in1 float_= float_+)) ()))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 12
+;;; -------------------------------------------------------
+;;; Best plushy: (float_absolute boolean_not in1 boolean_not in1 float_- false float_+ float_% boolean_and boolean_not float_* float_+ float_% float_positive exec_if)
+;;; Best program: (float_absolute boolean_not in1 boolean_not in1 float_- false float_+ float_% boolean_and boolean_not float_* float_+ float_% float_positive exec_if () ())
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 13
+;;; -------------------------------------------------------
+;;; Best plushy: (float_absolute boolean_not in1 boolean_or float_cbrt boolean_not boolean_or float_negative float_sqrt float_absolute float_absolute float_* boolean_not float_negative true exec_dup)
+;;; Best program: (float_absolute boolean_not in1 boolean_or float_cbrt boolean_not boolean_or float_negative float_sqrt float_absolute float_absolute float_* boolean_not float_negative true exec_dup ())
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 14
+;;; -------------------------------------------------------
+;;; Best plushy: (float_= boolean_not in1 boolean_and boolean_or float_absolute float_positive float_negative true float_absolute float_-)
+;;; Best program: (float_= boolean_not in1 boolean_and boolean_or float_absolute float_positive float_negative true float_absolute float_-)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 15
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_positive in1 exec_if float_absolute float_+ boolean_not in1 boolean_not float_positive true float_* float_* float_cbrt false float_positive false float_sqrt boolean_not)
+;;; Best program: (float_% float_positive in1 exec_if (float_absolute float_+ boolean_not in1 boolean_not float_positive true float_* float_* float_cbrt false float_positive false float_sqrt boolean_not) ())
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 16
+;;; -------------------------------------------------------
+;;; Best plushy: (float_absolute float_sqrt in1 boolean_not boolean_or float_= in1 float_+ float_sqrt float_- boolean_and boolean_not boolean_not float_* boolean_not float_+ exec_if)
+;;; Best program: (float_absolute float_sqrt in1 boolean_not boolean_or float_= in1 float_+ float_sqrt float_- boolean_and boolean_not boolean_not float_* boolean_not float_+ exec_if () ())
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 17
+;;; -------------------------------------------------------
+;;; Best plushy: (float_positive float_sqrt in1 in1 float_= float_absolute float_absolute float_+ boolean_not float_- boolean_not float_* float_+ boolean_or float_cbrt exec_if boolean_not)
+;;; Best program: (float_positive float_sqrt in1 in1 float_= float_absolute float_absolute float_+ boolean_not float_- boolean_not float_* float_+ boolean_or float_cbrt exec_if (boolean_not) ())
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 18
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_% in1 exec_dup false float_+ in1 boolean_not boolean_not float_positive float_sqrt float_sqrt float_+ float_sqrt boolean_and float_absolute float_positive)
+;;; Best program: (float_% float_% in1 exec_dup (false float_+ in1 boolean_not boolean_not float_positive float_sqrt float_sqrt float_+ float_sqrt boolean_and float_absolute float_positive))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 19
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_sqrt in1 boolean_not boolean_= exec_dup false float_* close boolean_or boolean_and false float_% true in1 float_cbrt)
+;;; Best program: (float_% float_sqrt in1 boolean_not boolean_= exec_dup (false float_*) boolean_or boolean_and false float_% true in1 float_cbrt)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 20
+;;; -------------------------------------------------------
+;;; Best plushy: (float_negative boolean_not in1 exec_if boolean_not float_* in1 in1 close boolean_not float_absolute float_sqrt boolean_and exec_if close float_+ float_sqrt float_negative boolean_or)
+;;; Best program: (float_negative boolean_not in1 exec_if (boolean_not float_* in1 in1) (boolean_not float_absolute float_sqrt boolean_and exec_if () (float_+ float_sqrt float_negative boolean_or)))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 21
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_% in1 in1 false in1 float_absolute float_absolute close float_sqrt false close boolean_= float_cbrt boolean_= float_positive)
+;;; Best program: (float_% float_% in1 in1 false in1 float_absolute float_absolute float_sqrt false boolean_= float_cbrt boolean_= float_positive)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 22
+;;; -------------------------------------------------------
+;;; Best plushy: (float_negative float_% in1 in1 boolean_not in1 in1 in1 float_absolute float_negative boolean_and float_negative float_sqrt float_positive float_positive boolean_=)
+;;; Best program: (float_negative float_% in1 in1 boolean_not in1 in1 in1 float_absolute float_negative boolean_and float_negative float_sqrt float_positive float_positive boolean_=)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 23
+;;; -------------------------------------------------------
+;;; Best plushy: (boolean_= float_absolute in1 float_sqrt float_+ float_absolute boolean_and in1 boolean_not float_sqrt float_negative boolean_not close float_+ float_absolute close)
+;;; Best program: (boolean_= float_absolute in1 float_sqrt float_+ float_absolute boolean_and in1 boolean_not float_sqrt float_negative boolean_not float_+ float_absolute)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 24
+;;; -------------------------------------------------------
+;;; Best plushy: (float_negative true in1 float_+ boolean_not in1 in1 float_negative boolean_or float_sqrt boolean_= float_positive)
+;;; Best program: (float_negative true in1 float_+ boolean_not in1 in1 float_negative boolean_or float_sqrt boolean_= float_positive)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 25
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_% in1 false boolean_and float_cbrt float_positive float_+ in1 float_cbrt float_sqrt float_absolute float_sqrt in1 float_* float_* float_* boolean_and float_negative)
+;;; Best program: (float_% float_% in1 false boolean_and float_cbrt float_positive float_+ in1 float_cbrt float_sqrt float_absolute float_sqrt in1 float_* float_* float_* boolean_and float_negative)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 26
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_positive in1 false boolean_and boolean_or false true in1 float_sqrt in1 float_+ false float_* float_negative true float_sqrt float_positive)
+;;; Best program: (float_% float_positive in1 false boolean_and boolean_or false true in1 float_sqrt in1 float_+ false float_* float_negative true float_sqrt float_positive)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 27
+;;; -------------------------------------------------------
+;;; Best plushy: (float_= true in1 in1 exec_dup in1 float_- float_absolute boolean_= close float_negative float_negative close float_cbrt float_positive float_%)
+;;; Best program: (float_= true in1 in1 exec_dup (in1 float_- float_absolute boolean_=) float_negative float_negative float_cbrt float_positive float_%)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 28
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_% in1 float_cbrt false boolean_= float_sqrt in1 float_= float_* exec_if float_positive float_cbrt float_positive boolean_not)
+;;; Best program: (float_% float_% in1 float_cbrt false boolean_= float_sqrt in1 float_= float_* exec_if (float_positive float_cbrt float_positive boolean_not) ())
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 29
+;;; -------------------------------------------------------
+;;; Best plushy: (float_sqrt float_positive in1 boolean_not boolean_not in1 in1 float_sqrt true boolean_or float_cbrt float_positive true boolean_=)
+;;; Best program: (float_sqrt float_positive in1 boolean_not boolean_not in1 in1 float_sqrt true boolean_or float_cbrt float_positive true boolean_=)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 30
+;;; -------------------------------------------------------
+;;; Best plushy: (float_% float_positive in1 float_% in1 float_- float_+ in1 in1 boolean_not float_cbrt exec_dup false float_+ float_% float_- boolean_or)
+;;; Best program: (float_% float_positive in1 float_% in1 float_- float_+ in1 in1 boolean_not float_cbrt exec_dup (false float_+ float_% float_- boolean_or))
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 31
+;;; -------------------------------------------------------
+;;; Best plushy: (float_= true in1 in1 in1 boolean_not exec_dup false in1 float_% float_absolute float_negative close float_negative float_positive close float_sqrt boolean_and true float_+)
+;;; Best program: (float_= true in1 in1 in1 boolean_not exec_dup (false in1 float_% float_absolute float_negative) float_negative float_positive float_sqrt boolean_and true float_+)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 32
+;;; -------------------------------------------------------
+;;; Best plushy: (float_negative boolean_not in1 float_- in1 float_+ in1 float_+ float_sqrt true float_cbrt boolean_not float_positive float_* float_positive)
+;;; Best program: (float_negative boolean_not in1 float_- in1 float_+ in1 float_+ float_sqrt true float_cbrt boolean_not float_positive float_* float_positive)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
+;;; -------------------------------------------------------
+;;;                Report for Generation 33
+;;; -------------------------------------------------------
+;;; Best plushy: (boolean_= float_positive in1 float_+ boolean_not in1 boolean_not float_positive in1 boolean_not in1 float_absolute float_* float_positive float_sqrt float_negative boolean_not float_positive boolean_not)
+;;; Best program: (boolean_= float_positive in1 float_+ boolean_not in1 boolean_not float_positive in1 boolean_not in1 float_absolute float_* float_positive float_sqrt float_negative boolean_not float_positive boolean_not)
+;;; Best total error: 6665.0
+;;; Best errors: (91.0 87.0 41.0 89.0 89.0 64.0 89.0 41.0 89.0 64.0 89.0 41.0 41.0 89.0 64.0 15.0 66.0 66.0 41.0 94.0 87.0 61.0 87.0 41.0 15.0 14.0 41.0 89.0 89.0 89.0 41.0 89.0 64.0 89.0 89.0 41.0 89.0 87.0 87.0 15.0 89.0 61.0 15.0 89.0 64.0 89.0 15.0 64.0 64.0 87.0 89.0 64.0 41.0 64.0 94.0 89.0 64.0 89.0 87.0 51.0 64.0 41.0 15.0 41.0 89.0 61.0 51.0 64.0 89.0 91.0 64.0 89.0 51.0 89.0 89.0 89.0 89.0 64.0 64.0 51.0 89.0 87.0 94.0 89.0 89.0 89.0 89.0 89.0 64.0 15.0 89.0 15.0 51.0 89.0 89.0 15.0 15.0 89.0 51.0)
+;;; Best behaviors: (1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0)
+;;; 
 ;;; 
 ;; <-
 
