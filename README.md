@@ -21,6 +21,7 @@ The total error gets too big that the program sometimes thinks it’s better to 
     2. Use Lexicase to selects parents that are good at predicting a particular category use these programs to generate a combination that can behave generally good on predicting all categories
     3. Find some way to balance data scale (with pregiven artificial methods..)-> to make numbers that are really small to matter equally as those with astronomical scale
     4. Modify cases in lexicase
+- other files -> helper functions
 
 
 
