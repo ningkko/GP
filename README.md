@@ -16,10 +16,11 @@ It's harder to make a GP program generate simple functions, because it's usually
 The total error gets too big that the program sometimes thinks it’s better to have no-stack-item or same behaviors all the time rather than to have the in1 instruction. 
  \
 -> Future directions
-1. Modify the fitness function
-Current concerns: Based on the current performance, it's not likely the program is going to find out how to round off and take modulo of the result. Some other fitness functions might be needed. 2. Use Lexicase to selects parents that are good at predicting a particular category use these programs to generate a combination that can behave generally good on predicting all categories
-3. Find some way to balance data scale (with pregiven artificial methods..)-> to make numbers that are really small to matter equally as those with astronomical scale
-4. Modify cases in lexicase
+    1. Modify the fitness function
+    Current concerns: Based on the current performance, it's not likely the program is going to find out how to round off and take modulo of the result. Some other fitness functions might be needed. 
+    2. Use Lexicase to selects parents that are good at predicting a particular category use these programs to generate a combination that can behave generally good on predicting all categories
+    3. Find some way to balance data scale (with pregiven artificial methods..)-> to make numbers that are really small to matter equally as those with astronomical scale
+    4. Modify cases in lexicase
 
 
 
