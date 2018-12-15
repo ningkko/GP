@@ -28,7 +28,7 @@ Dec 14th, 2018 => Just noticed that there's a problem in the current error-grant
 
 Structural reference:\
 -> Adaptive Probabilities of Crossover and Mutation in Genetic Algorithms\
-https://pdfs.semanticscholar.org/7f62/05f1cac497e9929cc2c7f6f1c767c2229254.pdf \
+https://pdfs.semanticscholar.org/7f62/05f1cac497e9929cc2c7f6f1c767c2229254.pdf 
 
 Crossover\
 -> https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm) \
