@@ -14,6 +14,7 @@ It's harder to make a GP program generate simple functions, because it's usually
  \
 -> CURRENT STATE OF THE PROGRAM: 
 The total error gets too big that the program sometimes thinks it’s better to have no-stack-item or same behaviors all the time rather than to have the in1 instruction. 
+Dec 14th, 2018 => Just noticed that there's a problem in the current error-granting method under extreme situations.
  \
 -> Future directions
     1. Modify the fitness function
